@@ -13,7 +13,7 @@ abstract class APIDetails {
 
     private static final String API_KEY = "522e083da03504672b87e8e12a6cbe55";
     private static final String MOVIE_API = "http://api.themoviedb.org/3/movie/popular";
-    private static final String IMAGE_PATH = "http://image.tmdb.org/t/p/w185/";
+    private static final String IMAGE_PATH = "http://image.tmdb.org/t/p/w500/";
 
     /*
     @param  String [apiPath, itemPath], boolean attatchKey
@@ -30,7 +30,7 @@ abstract class APIDetails {
 
         if (path.length == 2 && !attatchKey) { // We are not appending the key
             itemPath = path[1];
-            resourceUri = uri.appendPath(itemPath).build();
+            resourceUri = uri.appendEncodedPath(itemPath).build();
         } else {
             resourceUri = uri.appendQueryParameter("api_key", API_KEY).build();
         }

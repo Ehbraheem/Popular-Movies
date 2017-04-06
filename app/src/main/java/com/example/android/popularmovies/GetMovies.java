@@ -2,6 +2,8 @@ package com.example.android.popularmovies;
 
 import android.os.AsyncTask;
 
+import com.example.android.popularmovies.utils.APICallback;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,6 +20,12 @@ import java.net.URL;
  */
 
 public class GetMovies extends AsyncTask<URL, Void, JSONObject> {
+
+    private APICallback callback;
+
+    public GetMovies(APICallback callback) {
+        this.callback = callback;
+    }
 
     @Override
     protected JSONObject doInBackground(URL... params) {
@@ -55,6 +63,10 @@ public class GetMovies extends AsyncTask<URL, Void, JSONObject> {
 
     @Override
     protected void onPostExecute(JSONObject object) {
-        super.onPostExecute(object);
+        try {
+            callback.handleData(object);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

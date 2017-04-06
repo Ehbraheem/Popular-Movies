@@ -33,4 +33,8 @@ public class MovieParser {
 
         return moviesList;
     }
+
+    public static Movies[] parse(JSONObject object) throws JSONException {
+        return new MovieParser(object).parse();
+    }
 }
