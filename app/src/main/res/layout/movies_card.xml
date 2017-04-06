@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <android.support.v7.widget.CardView
+        android:id="@+id/movies_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/card_margin"
+        android:elevation="3dp"
+        app:cardCornerRadius="@dimen/card_movies_radius">
+        
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            
+            <ImageView
+                android:id="@+id/movies_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/movies_poster_height"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:scaleType="fitXY"/>
+
+            <TextView
+                android:id="@+id/movies_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/movies_thumbnail"
+                android:paddingLeft="@dimen/movies_title_padding"
+                android:paddingRight="@dimen/movies_title_padding"
+                android:paddingTop="@dimen/movies_title_padding"
+                android:textColor="@color/movies_title"
+                android:textSize="@dimen/movies_title"/>
+
+            <RatingBar
+                android:isIndicator="true"
+                android:numStars="5"
+                android:stepSize="0.5"
+                android:max="10"
+                style="@style/Widget.AppCompat.RatingBar.Small"
+                android:id="@+id/movie_rating"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+            <!---->
+            <!--<TextView-->
+                <!--android:id="@+id/movies_count"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@id/movies_title"-->
+                <!--android:paddingBottom="@dimen/movie_count_padding_bottom"-->
+                <!--android:paddingRight="@dimen/movies_title_padding"-->
+                <!--android:paddingLeft="@dimen/movies_title_padding"-->
+                <!--android:textSize="@dimen/movie_count"/>-->
+            <!---->
+            <!--<ImageView-->
+                <!--android:id="@+id/movies_overflow"-->
+                <!--android:layout_width="@dimen/ic_movies_overflow_width"-->
+                <!--android:layout_height="@dimen/ic_movies_overflow_height"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:layout_below="@id/movies_thumbnail"-->
+                <!--android:layout_marginTop="@dimen/ic_movies_overflow_margin_top"-->
+                <!--android:scaleType="centerCrop"/>-->
+        </RelativeLayout>
+        
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

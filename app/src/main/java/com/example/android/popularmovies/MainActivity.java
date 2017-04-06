@@ -1,14 +1,20 @@
 package com.example.android.popularmovies;
 
-import android.graphics.Movie;
+import android.app.ProgressDialog;
+import android.content.res.Resources;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 
 import com.example.android.popularmovies.data.Movies;
 import com.example.android.popularmovies.utils.APICallback;
-import com.squareup.picasso.Picasso;
+import com.example.android.popularmovies.utils.MoviesAdapter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,8 +24,10 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity
         implements APICallback{
 
-    private TextView mDisplayDetails;
-    private ImageView mPosterDisplay;
+    private RecyclerView mMoviesList;
+    private MoviesAdapter mMoviesAdapter;
+    private GridLayoutManager mLayoutManager;
+    private ProgressDialog mProgressDialog;
 
 
     @Override
@@ -27,15 +35,24 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mDisplayDetails = (TextView) findViewById(R.id.tv_display_json);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        collapsingToolbar();
+//        setSupportActionBar(toolbar);
 
-        mPosterDisplay = (ImageView) findViewById(R.id.im_display_image);
+        mMoviesList = (RecyclerView) findViewById(R.id.movies_list);
+
 
         requestData();
     }
 
 
     private void requestData() {
+
+        mProgressDialog = new ProgressDialog(this);
+
+        mProgressDialog.setMessage("Please Wait...");
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.show();
 
         GetMovies getMovies = new GetMovies(this);
 
@@ -47,15 +64,73 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void handleData(JSONObject object) throws JSONException {
 
+        mProgressDialog.cancel();
+
         Movies[] movies = MovieParser.parse(object);
 
-        Picasso.with(this)
-                .load(String.valueOf(APIDetails.makePosterUrl(movies[0].posterUrl)))
-                .into(mPosterDisplay);
+        mMoviesAdapter = new MoviesAdapter(movies, this);
 
-        for (Movies movie : movies) {
+        setUpRecyclerView();
 
-            mDisplayDetails.append(movie.plot + "/n/n/n");
+
+//        for (Movies movie : movies) {
+//
+//            mDisplayDetails.append(movie.plot + "/n/n/n");
+//        }
+    }
+
+    private  int convertDPtoPixel(int dp) {
+        Resources resources = getResources();
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.getDisplayMetrics()));
+    }
+
+    private void setUpRecyclerView() {
+
+        int dpToPixel = convertDPtoPixel(10);
+        boolean includeEdge = true;
+
+        GridSpacing gridSpacing = new GridSpacing(2, dpToPixel, includeEdge);
+        mLayoutManager = new GridLayoutManager(this, 2);
+
+        if (mMoviesAdapter != null) {
+            mMoviesList.setLayoutManager(mLayoutManager);
+            mMoviesList.addItemDecoration(gridSpacing);
+            mMoviesList.setItemAnimator(new DefaultItemAnimator());
+            mMoviesList.setAdapter(mMoviesAdapter);
         }
+    }
+
+
+    /*
+      Initializing collapsing toolbar
+      Will show and hide the toolbar title on scroll
+     */
+    private void collapsingToolbar() {
+        final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout)
+                findViewById(R.id.collapsing_toolbar);
+        collapsingToolbarLayout.setTitle(" ");
+        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
+        appBarLayout.setExpanded(true);
+
+        // hiding & showing the title when toolbar is expanded & collapsed
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            boolean isShow = false;
+            int scrollRange = -1;
+
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange();
+                }
+
+                if (scrollRange + verticalOffset == 0) {
+                    collapsingToolbarLayout.setTitle(getString(R.string.app_name));
+                    isShow = true;
+                } else if (isShow) {
+                    collapsingToolbarLayout.setTitle(" ");
+                    isShow = false;
+                }
+            }
+        });
     }
 }

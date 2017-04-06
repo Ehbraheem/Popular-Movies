@@ -9,7 +9,7 @@ import java.net.URL;
  * Created by Ehbraheem on 05/04/2017.
  */
 
-abstract class APIDetails {
+public abstract class APIDetails {
 
     private static final String API_KEY = "522e083da03504672b87e8e12a6cbe55";
     private static final String MOVIE_API = "http://api.themoviedb.org/3/movie/popular";
@@ -44,11 +44,11 @@ abstract class APIDetails {
         return url;
     }
 
-    static URL makePosterUrl (String posterPath) {
+    public static URL makePosterUrl (String posterPath) {
         return makeUrl(false, IMAGE_PATH, posterPath);
     }
 
-    static URL makeResourceUrl () {
+    public static URL makeResourceUrl () {
         return makeUrl(true, MOVIE_API);
     }
 }

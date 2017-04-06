@@ -12,7 +12,7 @@ public class Movies {
     public String title;
     public String posterUrl;
     public String plot;
-    public String ratting;
+    public String rating;
     public String releaseDate;
 
     public Movies(JSONObject object) {
@@ -22,7 +22,7 @@ public class Movies {
             this.plot = object.getString("overview");
             this.posterUrl = object.getString("poster_path");
             this.releaseDate = object.getString("release_date");
-            this.ratting = object.getString("vote_average");
+            this.rating = object.getString("vote_average");
 
         } catch (JSONException e) {
             e.printStackTrace();

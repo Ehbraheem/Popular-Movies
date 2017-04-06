@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Popular Movies</string>
+    <string name="main_title">CINEMA TRENDING MOVIES</string>
+    <string name="main_subtitle">Movies that currently being watched!</string>
+    <string name="trailers">Trailers</string>
 </resources>
