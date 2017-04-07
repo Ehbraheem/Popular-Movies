@@ -1,7 +1,10 @@
 package com.example.android.popularmovies;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Parcelable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +14,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
+import android.widget.Toast;
 
 import com.example.android.popularmovies.data.Movies;
 import com.example.android.popularmovies.utils.APICallback;
@@ -22,12 +26,13 @@ import org.json.JSONObject;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity
-        implements APICallback{
+        implements APICallback, MoviesAdapter.ListItemClickListener {
 
     private RecyclerView mMoviesList;
     private MoviesAdapter mMoviesAdapter;
     private GridLayoutManager mLayoutManager;
     private ProgressDialog mProgressDialog;
+    private Toast mToast;
 
 
     @Override
@@ -40,6 +45,8 @@ public class MainActivity extends AppCompatActivity
 //        setSupportActionBar(toolbar);
 
         mMoviesList = (RecyclerView) findViewById(R.id.movies_list);
+
+        mMoviesList.setHasFixedSize(true);
 
 
         requestData();
@@ -100,11 +107,25 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onListItemClick(int itemIndex, Movies movies) {
+
+        Class detailActivity = MovieDetail.class;
+
+        Intent intent = new Intent(this, detailActivity);
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(Intent.EXTRA_TEXT, movies);
+
+        intent.putExtras(bundle);
+
+        startActivity(intent);
+    }
 
     /*
-      Initializing collapsing toolbar
-      Will show and hide the toolbar title on scroll
-     */
+          Initializing collapsing toolbar
+          Will show and hide the toolbar title on scroll
+         */
     private void collapsingToolbar() {
         final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout)
                 findViewById(R.id.collapsing_toolbar);

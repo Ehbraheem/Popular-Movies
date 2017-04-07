@@ -13,7 +13,7 @@ public abstract class APIDetails {
 
     private static final String API_KEY = "522e083da03504672b87e8e12a6cbe55";
     private static final String MOVIE_API = "http://api.themoviedb.org/3/movie/popular";
-    private static final String IMAGE_PATH = "http://image.tmdb.org/t/p/w500/";
+    private static final String IMAGE_PATH = "http://image.tmdb.org/t/p/";
 
     /*
     @param  String [apiPath, itemPath], boolean attatchKey
@@ -44,8 +44,9 @@ public abstract class APIDetails {
         return url;
     }
 
-    public static URL makePosterUrl (String posterPath) {
-        return makeUrl(false, IMAGE_PATH, posterPath);
+    public static URL makePosterUrl (String posterPath, String size) {
+        String absolutePath = IMAGE_PATH + size;
+        return makeUrl(false, absolutePath, posterPath);
     }
 
     public static URL makeResourceUrl () {
