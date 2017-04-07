@@ -19,7 +19,7 @@ import com.squareup.picasso.Picasso;
 
 
 /**
- * Created by AppsWorkforce2 on 06/04/2017.
+ * Created by Ehbraheem on 06/04/2017.
  */
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewHolder> {

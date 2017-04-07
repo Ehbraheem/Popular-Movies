@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.os.Parcelable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -14,7 +13,9 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.android.popularmovies.data.Movies;
 import com.example.android.popularmovies.utils.APICallback;
@@ -32,7 +33,8 @@ public class MainActivity extends AppCompatActivity
     private MoviesAdapter mMoviesAdapter;
     private GridLayoutManager mLayoutManager;
     private ProgressDialog mProgressDialog;
-    private Toast mToast;
+    private TextView mErrorTextView;
+//    private ImageView mErrorImage;
 
 
     @Override
@@ -44,7 +46,10 @@ public class MainActivity extends AppCompatActivity
         collapsingToolbar();
 //        setSupportActionBar(toolbar);
 
-        mMoviesList = (RecyclerView) findViewById(R.id.movies_list);
+        mMoviesList    = (RecyclerView) findViewById(R.id.movies_list);
+
+        mErrorTextView = (TextView) findViewById(R.id.error_textview);
+//        mErrorImage    = (ImageView) findViewById(R.id.error_image);
 
         mMoviesList.setHasFixedSize(true);
 
@@ -61,7 +66,8 @@ public class MainActivity extends AppCompatActivity
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mProgressDialog.show();
 
-        GetMovies getMovies = new GetMovies(this);
+        Context context = getApplicationContext();
+        GetMovies getMovies = new GetMovies(this, context);
 
         URL apiDetails = APIDetails.makeResourceUrl();
 
@@ -73,11 +79,27 @@ public class MainActivity extends AppCompatActivity
 
         mProgressDialog.cancel();
 
-        Movies[] movies = MovieParser.parse(object);
+        if (object.has("error")) {
 
-        mMoviesAdapter = new MoviesAdapter(movies, this);
+            mMoviesList.setVisibility(View.INVISIBLE);
 
-        setUpRecyclerView();
+//            mErrorImage.setVisibility(View.VISIBLE);
+
+            String message = object.getString("error");
+
+            mErrorTextView.setVisibility(View.VISIBLE);
+            mErrorTextView.setText(message);
+
+
+        } else {
+
+            Movies[] movies = MovieParser.parse(object);
+
+            mMoviesAdapter = new MoviesAdapter(movies, this);
+
+            setUpRecyclerView();
+
+        }
 
 
 //        for (Movies movie : movies) {
@@ -92,6 +114,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setUpRecyclerView() {
+
+//        mErrorImage.setVisibility(View.GONE);
+        mErrorTextView.setVisibility(View.GONE);
 
         int dpToPixel = convertDPtoPixel(10);
         boolean includeEdge = true;

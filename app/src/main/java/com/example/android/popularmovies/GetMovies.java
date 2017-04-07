@@ -1,5 +1,8 @@
 package com.example.android.popularmovies;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 
 import com.example.android.popularmovies.utils.APICallback;
@@ -22,38 +25,55 @@ import java.net.URL;
 public class GetMovies extends AsyncTask<URL, Void, JSONObject> {
 
     private APICallback callback;
+    private Context mContext;
 
-    public GetMovies(APICallback callback) {
+    public GetMovies(APICallback callback, Context context) {
         this.callback = callback;
+        this.mContext = context;
     }
 
     @Override
     protected JSONObject doInBackground(URL... params) {
-        URL apiUrl = params[0];
-        JSONObject response = null;
+        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        try {
-            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+        if (networkInfo != null) {
+            URL apiUrl = params[0];
+            JSONObject response = null;
 
-            InputStream stream = new BufferedInputStream(connection.getInputStream());
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
+            try {
+                HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
 
-            StringBuilder builder = new StringBuilder();
-            String inputString;
+                InputStream stream = new BufferedInputStream(connection.getInputStream());
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
 
-            while((inputString = bufferedReader.readLine()) != null) {
-                builder.append(inputString);
+                StringBuilder builder = new StringBuilder();
+                String inputString;
+
+                while ((inputString = bufferedReader.readLine()) != null) {
+                    builder.append(inputString);
+                }
+
+                response = new JSONObject(String.valueOf(builder));
+                connection.disconnect();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } finally {
             }
+            return response;
+        }
 
-            response = new JSONObject(String.valueOf(builder));
-            connection.disconnect();
-        } catch (IOException e) {
-            e.printStackTrace();
+        JSONObject jsonObject = new JSONObject();
+        String json = "Network error or you are not connected!...";
+        try {
+            jsonObject = jsonObject.put("error", json);
         } catch (JSONException e) {
             e.printStackTrace();
-        } finally {
         }
-        return response;
+
+        return jsonObject;
     }
 
     @Override
