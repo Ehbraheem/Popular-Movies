@@ -11,7 +11,8 @@ import java.net.URL;
 
 public abstract class APIDetails {
 
-    private static final String API_KEY = "";
+    // TODO: ADD Your API Key => here
+    private static final String API_KEY = ""; // Add your key here
     private static final String MOVIE_API = "http://api.themoviedb.org/3/movie/popular";
     private static final String IMAGE_PATH = "http://image.tmdb.org/t/p/";
 
