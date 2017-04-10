@@ -13,8 +13,10 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.Movies;
@@ -34,6 +36,11 @@ public class MainActivity extends AppCompatActivity
     private GridLayoutManager mLayoutManager;
     private ProgressDialog mProgressDialog;
     private TextView mErrorTextView;
+
+    private static final String POPULAR_MOVIES = "popular";
+
+    private static final String MOST_RATED_MOVIES = "top_rated";
+
 //    private ImageView mErrorImage;
 
 
@@ -54,11 +61,35 @@ public class MainActivity extends AppCompatActivity
         mMoviesList.setHasFixedSize(true);
 
 
-        requestData();
+        requestData(POPULAR_MOVIES);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 
-    private void requestData() {
+        MenuInflater inflater = getMenuInflater();
+
+        inflater.inflate(R.menu.movie_menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.action_popular) {
+            requestData(POPULAR_MOVIES);
+            return true;
+        } else if (id == R.id.action_highest_rated) {
+            requestData(MOST_RATED_MOVIES);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void requestData(String type) {
 
         mProgressDialog = new ProgressDialog(this);
 
@@ -69,7 +100,7 @@ public class MainActivity extends AppCompatActivity
         Context context = getApplicationContext();
         GetMovies getMovies = new GetMovies(this, context);
 
-        URL apiDetails = APIDetails.makeResourceUrl();
+        URL apiDetails = APIDetails.makeResourceUrl(type);
 
         getMovies.execute(apiDetails);
     }

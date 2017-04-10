@@ -13,7 +13,7 @@ public abstract class APIDetails {
 
     // TODO: ADD Your API Key => here
     private static final String API_KEY = ""; // Add your key here
-    private static final String MOVIE_API = "http://api.themoviedb.org/3/movie/popular";
+    private static final String MOVIE_API = "http://api.themoviedb.org/3/movie/";
     private static final String IMAGE_PATH = "http://image.tmdb.org/t/p/";
 
     /*
@@ -50,7 +50,8 @@ public abstract class APIDetails {
         return makeUrl(false, absolutePath, posterPath);
     }
 
-    public static URL makeResourceUrl () {
-        return makeUrl(true, MOVIE_API);
+    public static URL makeResourceUrl (String type) {
+        String resourceType = MOVIE_API + type;
+        return makeUrl(true, resourceType);
     }
 }

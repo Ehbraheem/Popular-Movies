@@ -3,4 +3,7 @@
     <string name="main_title">CINEMA TRENDING MOVIES</string>
     <string name="main_subtitle">Movies that currently being watched!</string>
     <string name="trailers">Trailers</string>
+    <string name="movie_details">Movie Details</string>
+    <string name="most_popular">Most Popular</string>
+    <string name="highest_rated">Highest Rated</string>
 </resources>

@@ -23,6 +23,8 @@ public class MovieDetail extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
+        this.getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         mMoviePoster      = (ImageView) findViewById(R.id.movie_detail_thumbnail);
         mMovieTitle       = (TextView) findViewById(R.id.movie_detail_title);
         mMovieRating      = (RatingBar) findViewById(R.id.movie_detail_rating);
