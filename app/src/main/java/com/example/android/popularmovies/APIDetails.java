@@ -20,6 +20,17 @@ public abstract class APIDetails {
     @param  String [apiPath, itemPath], boolean attatchKey
     @return
      */
+
+    private static String attachExtraPathToMovie(String ... paths) {
+        String newPath = MOVIE_API;
+
+        for (String path: paths) {
+            newPath += path;
+        }
+        return newPath;
+    }
+
+
     private static URL makeUrl (boolean attatchKey, String ... path) {
         URL url = null;
         String itemPath = null;
@@ -46,12 +57,22 @@ public abstract class APIDetails {
     }
 
     public static URL makePosterUrl (String posterPath, String size) {
-        String absolutePath = IMAGE_PATH + size;
+        String absolutePath = attachExtraPathToMovie(size);
         return makeUrl(false, absolutePath, posterPath);
     }
 
     public static URL makeResourceUrl (String type) {
-        String resourceType = MOVIE_API + type;
+        String resourceType = attachExtraPathToMovie(type);
         return makeUrl(true, resourceType);
+    }
+
+    public static URL makeTrillerUrl(String key) {
+        String movieInfo = attachExtraPathToMovie(key, "/video");
+        return makeUrl(true, movieInfo);
+    }
+
+    public static URL reviewUrl (String key) {
+        String reviewInfo = attachExtraPathToMovie(key, "/reviews");
+        return makeUrl(true, reviewInfo);
     }
 }
