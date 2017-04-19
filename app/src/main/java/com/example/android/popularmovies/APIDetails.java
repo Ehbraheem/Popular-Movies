@@ -12,7 +12,7 @@ import java.net.URL;
 public abstract class APIDetails {
 
     // TODO: ADD Your API Key => here
-    private static final String API_KEY = ""; // Add your key here
+    private static final String API_KEY = BuildConfig.MOVIE_API_KEY; // Add your key here
     private static final String MOVIE_API = "http://api.themoviedb.org/3/movie/";
     private static final String IMAGE_PATH = "http://image.tmdb.org/t/p/";
 

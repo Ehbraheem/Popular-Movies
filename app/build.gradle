@@ -16,7 +16,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
+        buildTypes.each {
+
+            it.buildConfigField 'String', 'MOVIE_API_KEY', getApiKey("myApiKey")
+
+        }
     }
+
 }
 
 dependencies {
@@ -31,4 +38,10 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:design:25.3.1'
+}
+
+def getApiKey(String property) {
+    Properties properties = new Properties();
+    properties.load(new FileInputStream("./api_key"))
+    return "\"" + properties.getProperty(property) + "\""
 }
