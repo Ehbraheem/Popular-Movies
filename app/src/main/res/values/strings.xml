@@ -6,4 +6,9 @@
     <string name="movie_details">Movie Details</string>
     <string name="most_popular">Most Popular</string>
     <string name="highest_rated">Highest Rated</string>
+
+
+    <string name="authority">com.example.android.popularmovies</string>
+
+
 </resources>
