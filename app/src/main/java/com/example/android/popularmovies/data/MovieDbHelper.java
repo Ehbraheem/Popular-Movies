@@ -42,7 +42,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
                         MovieContract.MovieEntry.COLUMN_TITLE + " STRING NOT NULL, "           +
 
-                        " UNIQUE (" + MovieContract.MovieEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
+                        " UNIQUE (" + MovieContract.MovieEntry.COLUMN_MOVIE_ID + ") ON CONFLICT IGNORE);";
 
         db.execSQL(SQL_CREATE_MOVIE_TABLE);
     }

@@ -1,5 +1,6 @@
 package com.example.android.popularmovies.data;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -72,5 +73,18 @@ public class Movies implements Parcelable {
         this.posterUrl    = data[2];
         this.releaseDate  = data[3];
         this.rating       = data[4];
+    }
+
+    public ContentValues toContentValues() {
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(
+                "title", title);
+        contentValues.put("plot", plot);
+        contentValues.put("posterUrl", posterUrl);
+        contentValues.put("releaseDate", releaseDate);
+        contentValues.put("rating", rating);
+
+        return contentValues;
     }
 }

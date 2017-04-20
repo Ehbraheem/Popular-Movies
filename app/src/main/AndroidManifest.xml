@@ -38,6 +38,10 @@
             android:name=".data.MovieProvider"
             android:exported="true" />
 
+        <service android:name=".utils.MoviesSyncService"
+            android:exported="false" />
+
+
     </application>
 
 </manifest>

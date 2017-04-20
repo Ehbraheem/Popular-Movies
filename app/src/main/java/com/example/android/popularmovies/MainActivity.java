@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.data.MovieContract;
 import com.example.android.popularmovies.data.Movies;
 import com.example.android.popularmovies.utils.APICallback;
 import com.example.android.popularmovies.utils.MoviesAdapter;
@@ -98,11 +99,13 @@ public class MainActivity extends AppCompatActivity
         mProgressDialog.show();
 
         Context context = getApplicationContext();
-        GetMovies getMovies = new GetMovies(this, context);
+//        GetMovies getMovies = new GetMovies(this, context);
 
         URL apiDetails = APIDetails.makeResourceUrl(type);
 
-        getMovies.execute(apiDetails);
+//        getMovies.execute(apiDetails);
+        getContentResolver().query(
+                MovieContract.MovieEntry.CONTENT_URI)
     }
 
     @Override

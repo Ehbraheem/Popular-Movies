@@ -1,5 +1,7 @@
 package com.example.android.popularmovies;
 
+import android.content.ContentValues;
+
 import com.example.android.popularmovies.data.Movies;
 
 import org.json.JSONArray;
@@ -24,17 +26,28 @@ public class MovieParser {
         }
     }
 
-    public Movies[] parse () throws JSONException {
-        Movies[] moviesList = new Movies[movies.length()];
+    public Object[] parse (String type) throws JSONException {
+        Object[] moviesList = new Movies[movies.length()];
 
-        for (int i = 0; i < movies.length(); i++) {
-            moviesList[i] = new Movies(movies.getJSONObject(i));
+        if (type.equals(Movies.class.getName())) {
+
+            for (int i = 0; i < movies.length(); i++) {
+                moviesList[i] = new Movies(movies.getJSONObject(i));
+            }
+        } else {
+
+            for (int i = 0; i < movies.length(); i++) {
+                moviesList[i] = new Movies(movies.getJSONObject(i)).toContentValues();
+            }
         }
-
         return moviesList;
     }
 
     public static Movies[] parse(JSONObject object) throws JSONException {
-        return new MovieParser(object).parse();
+        return (Movies[]) new MovieParser(object).parse(Movies.class.getName());
+    }
+
+    public static ContentValues[] makeAsContentValues(JSONObject object) throws JSONException {
+        return (ContentValues[]) new MovieParser(object).parse(ContentValues.class.getName());
     }
 }
