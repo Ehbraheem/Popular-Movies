@@ -1,9 +1,14 @@
 package com.example.android.popularmovies;
 
+import android.app.LoaderManager;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.net.Uri;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +28,7 @@ import com.example.android.popularmovies.data.MovieContract;
 import com.example.android.popularmovies.data.Movies;
 import com.example.android.popularmovies.utils.APICallback;
 import com.example.android.popularmovies.utils.MoviesAdapter;
+import com.example.android.popularmovies.utils.MoviesSyncService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +36,26 @@ import org.json.JSONObject;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity
-        implements APICallback, MoviesAdapter.ListItemClickListener {
+        implements APICallback, MoviesAdapter.ListItemClickListener,
+        LoaderManager.LoaderCallbacks<Cursor>{
+
+    public static final String[] MAIN_MOVIE_PROJECTION = {
+            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieEntry.COLUMN_PLOT,
+            MovieContract.MovieEntry.COLUMN_FAVORITE,
+            MovieContract.MovieEntry.COLUMN_POSTER_URL,
+            MovieContract.MovieEntry.COLUMN_RATING,
+            MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
+            MovieContract.MovieEntry.COLUMN_TITLE
+    };
+
+    public static final int INDEX_MOVIE_ID = 0;
+    public static final int INDEX_MOVIE_PLOT = 1;
+    public static final int INDEX_MOVIE_FAVORITE = 2;
+    public static final int INDEX_MOVIE_POSTER_URL = 3;
+    public static final int INDEX_MOVIE_RATING = 4;
+    public static final int INDEX_MOVIE_RELEASE_DATE = 5;
+    public static final int INDEX_MOVIE_TITLE = 6;
 
     private RecyclerView mMoviesList;
     private MoviesAdapter mMoviesAdapter;
@@ -41,6 +66,8 @@ public class MainActivity extends AppCompatActivity
     private static final String POPULAR_MOVIES = "popular";
 
     private static final String MOST_RATED_MOVIES = "top_rated";
+
+    private static final int MOVIE_LOADER_ID = 778;
 
 //    private ImageView mErrorImage;
 
@@ -62,7 +89,8 @@ public class MainActivity extends AppCompatActivity
         mMoviesList.setHasFixedSize(true);
 
 
-        requestData(POPULAR_MOVIES);
+        Intent intent = new Intent(this, MoviesSyncService.class);
+        startService(intent);
     }
 
     @Override
@@ -97,15 +125,13 @@ public class MainActivity extends AppCompatActivity
         mProgressDialog.setMessage("Please Wait...");
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mProgressDialog.show();
-
-        Context context = getApplicationContext();
-//        GetMovies getMovies = new GetMovies(this, context);
-
-        URL apiDetails = APIDetails.makeResourceUrl(type);
-
-//        getMovies.execute(apiDetails);
-        getContentResolver().query(
-                MovieContract.MovieEntry.CONTENT_URI)
+//
+//        Context context = getApplicationContext();
+////        GetMovies getMovies = new GetMovies(this, context);
+//
+//        URL apiDetails = APIDetails.makeResourceUrl(type);
+//
+////        getMovies.execute(apiDetails);
     }
 
     @Override
@@ -127,11 +153,10 @@ public class MainActivity extends AppCompatActivity
 
         } else {
 
-            Movies[] movies = MovieParser.parse(object);
-
-            mMoviesAdapter = new MoviesAdapter(movies, this);
+            mMoviesAdapter = new MoviesAdapter(this, this);
 
             setUpRecyclerView();
+
 
         }
 
@@ -167,16 +192,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListItemClick(int itemIndex, Movies movies) {
+    public void onListItemClick(int itemIndex) {
 
         Class detailActivity = MovieDetail.class;
 
         Intent intent = new Intent(this, detailActivity);
 
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(Intent.EXTRA_TEXT, movies);
+        Uri uriForMovieClicked = MovieContract.MovieEntry.buildUriWithId(itemIndex);
 
-        intent.putExtras(bundle);
+        intent.setData(uriForMovieClicked);
 
         startActivity(intent);
     }
@@ -212,5 +236,44 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
+
+        switch (loaderId) {
+
+            case MOVIE_LOADER_ID:
+
+                Uri moviesUri = MovieContract.MovieEntry.CONTENT_URI;
+
+                return new CursorLoader(
+                        this,
+                        moviesUri,
+                        MAIN_MOVIE_PROJECTION,
+                        null,
+                        null,
+                        null
+                );
+
+            default:
+                throw new RuntimeException("Loader Not Implemented: " + loaderId);
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        mProgressDialog.cancel();
+        mMoviesAdapter = new MoviesAdapter(this, this);
+
+        setUpRecyclerView();
+
+        mMoviesAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mMoviesAdapter.swapCursor(null);
     }
 }

@@ -23,9 +23,9 @@ public class MovieContract {
                 .build();
 
 
-        public static final String TABLE_NAME = "movies";
+        public static final String TABLE_NAME = "movie";
 
-        public static final String COLUMN_TITLE = "date";
+        public static final String COLUMN_TITLE = "title";
 
         public static final String COLUMN_POSTER_URL = "poster_url";
 
@@ -47,6 +47,11 @@ public class MovieContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + TABLE_NAME;
 
+        public static Uri buildUriWithId(int id) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(String.valueOf(id))
+                    .build();
+        }
 
         public static String createSqlSelectorForFavoriteMovies() {
             return MovieEntry.COLUMN_FAVORITE + " = ?";

@@ -11,6 +11,8 @@ import org.json.JSONObject;
  * Created by Ehbraheem on 05/04/2017.
  */
 
+// TODO: Add the remaining field for proper database insert
+
 public class Movies implements Parcelable {
 
     public String title;
@@ -78,12 +80,11 @@ public class Movies implements Parcelable {
     public ContentValues toContentValues() {
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(
-                "title", title);
-        contentValues.put("plot", plot);
-        contentValues.put("posterUrl", posterUrl);
-        contentValues.put("releaseDate", releaseDate);
-        contentValues.put("rating", rating);
+        contentValues.put(MovieContract.MovieEntry.COLUMN_TITLE, title);
+        contentValues.put(MovieContract.MovieEntry.COLUMN_PLOT, plot);
+        contentValues.put(MovieContract.MovieEntry.COLUMN_POSTER_URL, posterUrl);
+        contentValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, releaseDate);
+        contentValues.put(MovieContract.MovieEntry.COLUMN_RATING, rating);
 
         return contentValues;
     }

@@ -27,19 +27,18 @@ public class MovieParser {
     }
 
     public Object[] parse (String type) throws JSONException {
-        Object[] moviesList = new Movies[movies.length()];
+        Object[] moviesList = new ContentValues[movies.length()];
 
-        if (type.equals(Movies.class.getName())) {
-
-            for (int i = 0; i < movies.length(); i++) {
-                moviesList[i] = new Movies(movies.getJSONObject(i));
-            }
-        } else {
-
+//        if (type.equals(Movies.class.getName())) {
+//
+//            for (int i = 0; i < movies.length(); i++) {
+//                moviesList[i] = new Movies(movies.getJSONObject(i));
+//            }
+//        } else {
             for (int i = 0; i < movies.length(); i++) {
                 moviesList[i] = new Movies(movies.getJSONObject(i)).toContentValues();
             }
-        }
+//        }
         return moviesList;
     }
 

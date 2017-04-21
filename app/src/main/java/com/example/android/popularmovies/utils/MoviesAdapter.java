@@ -1,6 +1,7 @@
 package com.example.android.popularmovies.utils;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,28 +34,30 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
 
     public interface ListItemClickListener {
 
-        void onListItemClick(int itemIndex, Movies movie);
+        void onListItemClick(int itemIndex);
     }
 //
 //    private int nmNumberItems;
-    private Movies[] movies;
+//    private Movies[] movies;
+    private Cursor mCursor;
 
-    public MoviesAdapter(Movies[] movies, MainActivity activity) {
-        this.movies = movies;
-        this.mContext = activity;
-        this.mOnclickListener = activity;
+    public MoviesAdapter(Context context, ListItemClickListener listener) {
+        this.mContext = context;
+        this.mOnclickListener = listener;
     }
 
     @Override
     public void onBindViewHolder(MovieViewHolder holder, int position) {
+
+        mCursor.moveToPosition(position);
+
         Log.d(TAG, "#" + position);
-        Movies movie = movies[position];
-        holder.bind(movie, mContext);
+        holder.bind(mContext);
     }
 
     @Override
     public int getItemCount() {
-        return movies.length;
+        return mCursor.getCount();
     }
 
     @Override
@@ -62,6 +65,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         boolean attatchToParentNow = false;
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.movies_card, parent, attatchToParentNow);
+
+        view.setFocusable(true);
 
         MovieViewHolder movieViewHolder = new MovieViewHolder(view);
 
@@ -93,24 +98,33 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         @Override
         public void onClick(View v) {
             int clickedPosition = getAdapterPosition();
-            mOnclickListener.onListItemClick(clickedPosition, movies[clickedPosition]);
+            mOnclickListener.onListItemClick(clickedPosition);
         }
 
-        void bind(Movies movie, Context context) {
+        void bind(Context context) {
 
             String imageSize = "w185/";
 
-            mTitle.setText(movie.title);
+            String title = mCursor.getString(MainActivity.INDEX_MOVIE_TITLE);
+            String posterUrl = mCursor.getString(MainActivity.INDEX_MOVIE_POSTER_URL);
+            Float rating = mCursor.getFloat(MainActivity.INDEX_MOVIE_RATING);
 
-            float rating = Float.parseFloat(movie.rating) / 2;
+            mTitle.setText(title);
+
+            rating = rating / 2;
 
             mUserRating.setNumStars(5);
             mUserRating.setStepSize(0.5f);
             mUserRating.setRating(rating);
 
             Picasso.with(context)
-                    .load(String.valueOf(APIDetails.makePosterUrl(movie.posterUrl, imageSize )))
+                    .load(String.valueOf(APIDetails.makePosterUrl(posterUrl, imageSize )))
                     .into(mPosterImage);
         }
+    }
+
+    public void swapCursor(Cursor cursor) {
+        mCursor = cursor;
+        notifyDataSetChanged();
     }
 }
