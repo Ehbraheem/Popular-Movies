@@ -128,12 +128,14 @@ public class MovieProvider extends ContentProvider {
 
                 String movieID = uri.getLastPathSegment();
 
+                String movieSelection = MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ";
+
                 String[] selectionArguments = makeSelectionArgs(movieID);
 
                 cursor = movieDbHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TABLE_NAME,
                         projection,
-                        MovieContract.MovieEntry._ID,
+                        movieSelection,
                         selectionArguments,
                         null,
                         null,

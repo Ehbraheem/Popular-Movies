@@ -36,22 +36,16 @@ public class MainActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor>, APICallback, MoviesAdapter.ListItemClickListener{
 
     public static final String[] MAIN_MOVIE_PROJECTION = {
-            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
-            MovieContract.MovieEntry.COLUMN_PLOT,
-            MovieContract.MovieEntry.COLUMN_FAVORITE,
             MovieContract.MovieEntry.COLUMN_POSTER_URL,
             MovieContract.MovieEntry.COLUMN_RATING,
-            MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
-            MovieContract.MovieEntry.COLUMN_TITLE
+            MovieContract.MovieEntry.COLUMN_TITLE,
+            MovieContract.MovieEntry.COLUMN_MOVIE_ID
     };
 
-    public static final int INDEX_MOVIE_ID = 0;
-    public static final int INDEX_MOVIE_PLOT = 1;
-    public static final int INDEX_MOVIE_FAVORITE = 2;
-    public static final int INDEX_MOVIE_POSTER_URL = 3;
-    public static final int INDEX_MOVIE_RATING = 4;
-    public static final int INDEX_MOVIE_RELEASE_DATE = 5;
-    public static final int INDEX_MOVIE_TITLE = 6;
+    public static final int INDEX_MOVIE_POSTER_URL = 0;
+    public static final int INDEX_MOVIE_RATING = 1;
+    public static final int INDEX_MOVIE_TITLE = 2;
+    public static final int INDEX_MOVIE_ID = 3;
 
     private RecyclerView mMoviesList;
     private MoviesAdapter mMoviesAdapter;
@@ -74,8 +68,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         collapsingToolbar();
-//        setSupportActionBar(toolbar);
 
         mMoviesList    = (RecyclerView) findViewById(R.id.movies_list);
 

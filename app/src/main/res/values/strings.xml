@@ -7,6 +7,7 @@
     <string name="most_popular">Most Popular</string>
     <string name="highest_rated">Highest Rated</string>
 
+    <string name="action_add_favorite">Add to Favourites</string>
 
     <string name="authority">com.example.android.popularmovies</string>
 
