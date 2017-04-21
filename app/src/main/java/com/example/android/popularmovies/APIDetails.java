@@ -21,8 +21,8 @@ public abstract class APIDetails {
     @return
      */
 
-    private static String attachExtraPathToMovie(String ... paths) {
-        String newPath = MOVIE_API;
+    private static String attachExtraPathToMovie(boolean imagePath, String ... paths) {
+        String newPath = imagePath ? IMAGE_PATH : MOVIE_API;
 
         for (String path: paths) {
             newPath += path;
@@ -57,22 +57,22 @@ public abstract class APIDetails {
     }
 
     public static URL makePosterUrl (String posterPath, String size) {
-        String absolutePath = attachExtraPathToMovie(size);
+        String absolutePath = attachExtraPathToMovie(true, size);
         return makeUrl(false, absolutePath, posterPath);
     }
 
     public static URL makeResourceUrl (String type) {
-        String resourceType = attachExtraPathToMovie(type);
+        String resourceType = attachExtraPathToMovie(false, type);
         return makeUrl(true, resourceType);
     }
 
     public static URL makeTrillerUrl(String key) {
-        String movieInfo = attachExtraPathToMovie(key, "/video");
+        String movieInfo = attachExtraPathToMovie(false, key, "/video");
         return makeUrl(true, movieInfo);
     }
 
     public static URL reviewUrl (String key) {
-        String reviewInfo = attachExtraPathToMovie(key, "/reviews");
+        String reviewInfo = attachExtraPathToMovie(false,key, "/reviews");
         return makeUrl(true, reviewInfo);
     }
 }

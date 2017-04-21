@@ -1,11 +1,10 @@
 package com.example.android.popularmovies;
 
-import android.app.LoaderManager;
+import android.support.v4.app.LoaderManager;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.CursorLoader;
+import android.support.v4.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
+import android.support.v4.content.Loader;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
@@ -25,7 +24,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract;
-import com.example.android.popularmovies.data.Movies;
 import com.example.android.popularmovies.utils.APICallback;
 import com.example.android.popularmovies.utils.MoviesAdapter;
 import com.example.android.popularmovies.utils.MoviesSyncService;
@@ -33,11 +31,9 @@ import com.example.android.popularmovies.utils.MoviesSyncService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URL;
 
 public class MainActivity extends AppCompatActivity
-        implements APICallback, MoviesAdapter.ListItemClickListener,
-        LoaderManager.LoaderCallbacks<Cursor>{
+        implements LoaderManager.LoaderCallbacks<Cursor>, APICallback, MoviesAdapter.ListItemClickListener{
 
     public static final String[] MAIN_MOVIE_PROJECTION = {
             MovieContract.MovieEntry.COLUMN_MOVIE_ID,
@@ -88,6 +84,14 @@ public class MainActivity extends AppCompatActivity
 
         mMoviesList.setHasFixedSize(true);
 
+        mProgressDialog = new ProgressDialog(this);
+
+        mProgressDialog.setMessage("Please Wait...");
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.show();
+
+
+        getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
 
         Intent intent = new Intent(this, MoviesSyncService.class);
         startService(intent);

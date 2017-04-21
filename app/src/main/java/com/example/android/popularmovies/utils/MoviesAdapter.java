@@ -17,6 +17,7 @@ import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.data.Movies;
 import com.squareup.picasso.Picasso;
 
+import java.net.URL;
 
 
 /**
@@ -117,8 +118,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
             mUserRating.setStepSize(0.5f);
             mUserRating.setRating(rating);
 
+            URL imageUrl = APIDetails.makePosterUrl(posterUrl, imageSize );
+
             Picasso.with(context)
-                    .load(String.valueOf(APIDetails.makePosterUrl(posterUrl, imageSize )))
+                    .load(String.valueOf(imageUrl))
                     .into(mPosterImage);
         }
     }

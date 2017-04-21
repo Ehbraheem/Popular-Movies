@@ -20,6 +20,7 @@ public class Movies implements Parcelable {
     public String plot;
     public String rating;
     public String releaseDate;
+    public String movieId;
 
     public Movies(JSONObject object) {
 
@@ -29,6 +30,7 @@ public class Movies implements Parcelable {
             this.posterUrl = object.getString("poster_path");
             this.releaseDate = object.getString("release_date");
             this.rating = object.getString("vote_average");
+            this.movieId = String.valueOf(object.getInt("id"));
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -47,7 +49,8 @@ public class Movies implements Parcelable {
                                             this.plot,
                                             this.posterUrl,
                                             this.releaseDate,
-                                            this.rating
+                                            this.rating,
+                                            this.movieId
         });
 
     }
@@ -75,6 +78,7 @@ public class Movies implements Parcelable {
         this.posterUrl    = data[2];
         this.releaseDate  = data[3];
         this.rating       = data[4];
+        this.movieId      = data[5];
     }
 
     public ContentValues toContentValues() {
@@ -85,6 +89,7 @@ public class Movies implements Parcelable {
         contentValues.put(MovieContract.MovieEntry.COLUMN_POSTER_URL, posterUrl);
         contentValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, releaseDate);
         contentValues.put(MovieContract.MovieEntry.COLUMN_RATING, rating);
+        contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
 
         return contentValues;
     }
