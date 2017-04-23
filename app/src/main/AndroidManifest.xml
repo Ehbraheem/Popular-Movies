@@ -44,6 +44,9 @@
         <service android:name=".utils.ReviewSyncService"
             android:exported="false" />
 
+        <service android:name=".utils.TrailerSyncService"
+            android:exported="false" />
+
 
     </application>
 

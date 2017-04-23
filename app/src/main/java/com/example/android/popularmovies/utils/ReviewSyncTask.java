@@ -10,7 +10,6 @@ import com.example.android.popularmovies.APIDetails;
 import com.example.android.popularmovies.ReviewParser;
 import com.example.android.popularmovies.data.MovieContract;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URL;
@@ -39,8 +38,8 @@ public class ReviewSyncTask {
 
                 reviewContentResolver.bulkInsert(reviewUri, reviewValues);
             }
-        } finally {
-
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 }

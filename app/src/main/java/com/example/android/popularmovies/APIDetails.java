@@ -67,7 +67,7 @@ public abstract class APIDetails {
     }
 
     public static URL makeTrillerUrl(String key) {
-        String movieInfo = attachExtraPathToMovie(false, key, "/video");
+        String movieInfo = attachExtraPathToMovie(false, key, "/videos");
         return makeUrl(true, movieInfo);
     }
 

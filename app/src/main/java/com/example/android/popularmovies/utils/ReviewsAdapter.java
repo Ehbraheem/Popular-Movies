@@ -52,6 +52,7 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
     public int getItemCount() {
         return mCursor.getCount();
     }
+
     public class ReviewViewHolder extends RecyclerView.ViewHolder {
 
         final TextView mReview;

@@ -19,6 +19,8 @@ public class MovieContract {
 
     public static final String PATH_REVIEWS = "reviews";
 
+    public static final String PATH_TRAILERS = "trailers";
+
     public static final class MovieEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
@@ -52,10 +54,8 @@ public class MovieContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + TABLE_NAME;
 
-        public static Uri buildUriWithId(int id) {
-            return CONTENT_URI.buildUpon()
-                    .appendPath(String.valueOf(id))
-                    .build();
+        public static Uri buildUriWithId(long id) {
+            return buildUriWithObjectId(id, CONTENT_URI);
         }
 
         public static String createSqlSelectorForFavoriteMovies() {
@@ -81,7 +81,35 @@ public class MovieContract {
         public static final String COLUMN_AUTHOR = "author";
 
         public static Uri buildReviewUri(long id, String movieId) {
-            return ContentUris.withAppendedId(CONTENT_URI(movieId), id);
+            return buildUriWithObjectId(id, CONTENT_URI(movieId));
         }
+    }
+
+    public static final class TrailerEntry implements BaseColumns {
+
+        public static Uri CONTENT_URI(String movieId) {
+            return MovieEntry.CONTENT_URI.buildUpon()
+                    .appendPath(movieId)
+                    .appendPath(PATH_TRAILERS)
+                    .build();
+        }
+
+        public static final String TABLE_NAME = "trailers";
+
+        public static final String COLUMN_KEY = "key";
+
+        public static final String COLUMN_TYPE = "type";
+
+        public static final String COLUMN_NAME = "name";
+
+        public static final String COLUMN_SIZE = "size";
+
+        public static Uri buildVideoUriWithId(long id, String movieId) {
+            return buildUriWithObjectId(id, CONTENT_URI(movieId));
+        }
+    }
+
+    private static Uri buildUriWithObjectId(long id,Uri uri) {
+        return ContentUris.withAppendedId(uri, id);
     }
 }

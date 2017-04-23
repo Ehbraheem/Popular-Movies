@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.view.menu.MenuAdapter;
 
 /**
  * Created by Ehbraheem on 19/04/2017.
@@ -24,11 +23,15 @@ public class MovieProvider extends ContentProvider {
 
     public static final int CODE_SINGLE_MOVIE_REVIEW = 1011;
 
+    public static final int CODE_SINGLE_MOVIE_TRAILER = 1022;
+
     public static final int CODE_FAVORITE_MOVIES = 200;
 
     private MovieDbHelper movieDbHelper;
 
     private ReviewDbHelper reviewDbHelper;
+
+    private TrailerDbHelper trailerDbHelper;
 
     public static final UriMatcher sUriMatcher = buildUriMatcher();
 
@@ -45,10 +48,15 @@ public class MovieProvider extends ContentProvider {
 
         matcher.addURI(authority, MovieContract.PATH_MOVIES + "/#", CODE_SINGLE_MOVIE);
 
-        // Reviews of a paticluar movie
+        // Reviews of a paticluar movie with uri /movies/234/reviews
         matcher.addURI(authority,
                 MovieContract.PATH_MOVIES + "/#/" + MovieContract.PATH_REVIEWS,
                 CODE_SINGLE_MOVIE_REVIEW);
+
+        // Trailers of a paticluar movie with uri /movies/234/trailers
+        matcher.addURI(authority,
+                MovieContract.PATH_MOVIES + "/#/" + MovieContract.PATH_TRAILERS,
+                CODE_SINGLE_MOVIE_TRAILER);
 
         return matcher;
     }
@@ -62,19 +70,20 @@ public class MovieProvider extends ContentProvider {
 
         reviewDbHelper = new ReviewDbHelper(context);
 
+        trailerDbHelper = new TrailerDbHelper(context);
+
         return true;
     }
 
     @Override
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
 
-        final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
-        final SQLiteDatabase reviewDb = reviewDbHelper.getWritableDatabase();
         String movieId;
 
         switch (sUriMatcher.match(uri)) {
 
             case CODE_MOVIES:
+                final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
                 db.beginTransaction();
                 int moviesInserted = 0;
 
@@ -97,6 +106,7 @@ public class MovieProvider extends ContentProvider {
 
             case CODE_SINGLE_MOVIE_REVIEW:
 
+                final SQLiteDatabase reviewDb = reviewDbHelper.getWritableDatabase();
                 reviewDb.beginTransaction();
                 int reviewsInserted = 0;
                 movieId = uri.getPathSegments().get(1);
@@ -119,7 +129,34 @@ public class MovieProvider extends ContentProvider {
                 if (reviewsInserted > 0) {
                     getContext().getContentResolver().notifyChange(uri, null);
                 }
+                return reviewsInserted;
 
+            case CODE_SINGLE_MOVIE_TRAILER:
+
+                final SQLiteDatabase trailerDb = trailerDbHelper.getWritableDatabase();
+                trailerDb.beginTransaction();
+                int trailersInserted = 0;
+                movieId = uri.getPathSegments().get(1);
+
+                try {
+
+                    for (ContentValues cv: values) {
+                        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
+                        long _id = trailerDb.insert(MovieContract.TrailerEntry.TABLE_NAME, null, cv);
+
+                        if (_id != -1) trailersInserted++;
+                    }
+                    trailerDb.endTransaction();
+                } finally {
+                    if (trailerDb.inTransaction()) {
+                        trailerDb.endTransaction();
+                    }
+                }
+
+                if (trailersInserted > 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+                return trailersInserted;
 
             default:
                 return super.bulkInsert(uri, values);
@@ -201,6 +238,23 @@ public class MovieProvider extends ContentProvider {
                 );
                 break;
 
+            case CODE_SINGLE_MOVIE_TRAILER:
+
+                String movieIds = uri.getPathSegments().get(1);
+                String trailerSelection = MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ";
+                String[] trailerMovieId = makeSelectionArgs(movieIds);
+
+                cursor = trailerDbHelper.getReadableDatabase().query(
+                        MovieContract.TrailerEntry.TABLE_NAME,
+                        projection,
+                        trailerSelection,
+                        trailerMovieId,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+
             default:
 //                Log.d("URI", )
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -266,8 +320,7 @@ public class MovieProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
-        final SQLiteDatabase reviewDb = reviewDbHelper.getWritableDatabase();
+
         String movieId;
 
         Uri returnUri = null;
@@ -278,6 +331,7 @@ public class MovieProvider extends ContentProvider {
 
             case CODE_SINGLE_MOVIE:
 
+                final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
                 id = db.insert(
                         MovieContract.MovieEntry.TABLE_NAME,
                         null,
@@ -291,6 +345,8 @@ public class MovieProvider extends ContentProvider {
                 break;
 
             case CODE_SINGLE_MOVIE_REVIEW:
+
+                final SQLiteDatabase reviewDb = reviewDbHelper.getWritableDatabase();
                 movieId = uri.getPathSegments().get(1);
                 values.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
 
@@ -304,6 +360,24 @@ public class MovieProvider extends ContentProvider {
                     returnUri = MovieContract.ReviewEntry.buildReviewUri(id, movieId);
                 }
                 break;
+
+            case CODE_SINGLE_MOVIE_TRAILER:
+
+                final SQLiteDatabase trailerDb = trailerDbHelper.getWritableDatabase();
+                movieId = uri.getPathSegments().get(1);
+                values.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
+
+                id = trailerDb.insert(
+                        MovieContract.TrailerEntry.TABLE_NAME,
+                        null,
+                        values
+                );
+
+                if (id > 0) {
+                    returnUri = MovieContract.TrailerEntry.buildVideoUriWithId(id, movieId);
+                }
+                break;
+
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
