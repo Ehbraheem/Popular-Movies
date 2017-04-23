@@ -40,6 +40,9 @@
 
         <service android:name=".utils.MoviesSyncService"
             android:exported="false" />
+        
+        <service android:name=".utils.ReviewSyncService"
+            android:exported="false" />
 
 
     </application>

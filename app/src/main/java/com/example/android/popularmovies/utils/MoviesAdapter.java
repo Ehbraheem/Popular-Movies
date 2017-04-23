@@ -92,12 +92,14 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
             this.mPosterImage = (ImageView) itemView.findViewById(R.id.movies_thumbnail);
             this.mUserRating = (RatingBar) itemView.findViewById(R.id.movie_rating);
 
-            mPosterImage.setOnClickListener(this);
+            itemView.setOnClickListener(this);
 //            this.mPlot = (RatingBar) itemView.findViewById(R.id.movies_title);
         }
 
         @Override
         public void onClick(View v) {
+            int position = getAdapterPosition();
+            mCursor.moveToPosition(position);
             int clickedPosition = mCursor.getInt(MainActivity.INDEX_MOVIE_ID);
             mOnclickListener.onListItemClick(clickedPosition);
         }

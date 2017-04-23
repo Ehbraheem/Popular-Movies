@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.view.menu.MenuAdapter;
 
 /**
  * Created by Ehbraheem on 19/04/2017.
@@ -21,9 +22,14 @@ public class MovieProvider extends ContentProvider {
 
     public static final int CODE_SINGLE_MOVIE = 101;
 
+    public static final int CODE_SINGLE_MOVIE_REVIEW = 1011;
+
     public static final int CODE_FAVORITE_MOVIES = 200;
 
     private MovieDbHelper movieDbHelper;
+
+    private ReviewDbHelper reviewDbHelper;
+
     public static final UriMatcher sUriMatcher = buildUriMatcher();
 
 
@@ -39,6 +45,11 @@ public class MovieProvider extends ContentProvider {
 
         matcher.addURI(authority, MovieContract.PATH_MOVIES + "/#", CODE_SINGLE_MOVIE);
 
+        // Reviews of a paticluar movie
+        matcher.addURI(authority,
+                MovieContract.PATH_MOVIES + "/#/" + MovieContract.PATH_REVIEWS,
+                CODE_SINGLE_MOVIE_REVIEW);
+
         return matcher;
     }
 
@@ -49,6 +60,8 @@ public class MovieProvider extends ContentProvider {
 
         movieDbHelper = new MovieDbHelper(context);
 
+        reviewDbHelper = new ReviewDbHelper(context);
+
         return true;
     }
 
@@ -56,6 +69,8 @@ public class MovieProvider extends ContentProvider {
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
 
         final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
+        final SQLiteDatabase reviewDb = reviewDbHelper.getWritableDatabase();
+        String movieId;
 
         switch (sUriMatcher.match(uri)) {
 
@@ -79,6 +94,32 @@ public class MovieProvider extends ContentProvider {
                 }
 
                 return moviesInserted;
+
+            case CODE_SINGLE_MOVIE_REVIEW:
+
+                reviewDb.beginTransaction();
+                int reviewsInserted = 0;
+                movieId = uri.getPathSegments().get(1);
+
+                try {
+
+                    for (ContentValues cv: values) {
+                        cv.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
+                        long _id = reviewDb.insert(MovieContract.ReviewEntry.TABLE_NAME, null, cv);
+
+                        if (_id != -1) reviewsInserted++;
+                    }
+                    reviewDb.endTransaction();
+                } finally {
+                    if (reviewDb.inTransaction()) {
+                        reviewDb.endTransaction();
+                    }
+                }
+
+                if (reviewsInserted > 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+
 
             default:
                 return super.bulkInsert(uri, values);
@@ -142,7 +183,26 @@ public class MovieProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
+
+            case CODE_SINGLE_MOVIE_REVIEW:
+
+                String movieId = uri.getPathSegments().get(1);
+                String reviewSelection = MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ";
+                String[] reviewMovieId = makeSelectionArgs(movieId);
+
+                cursor = reviewDbHelper.getReadableDatabase().query(
+                        MovieContract.ReviewEntry.TABLE_NAME,
+                        projection,
+                        reviewSelection,
+                        reviewMovieId,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+
             default:
+//                Log.d("URI", )
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
@@ -206,8 +266,51 @@ public class MovieProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        throw new RuntimeException(
-                "I am not implementing this method. Use bulkInsert instead");
+        final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
+        final SQLiteDatabase reviewDb = reviewDbHelper.getWritableDatabase();
+        String movieId;
+
+        Uri returnUri = null;
+
+        long id = 0;
+
+        switch (sUriMatcher.match(uri)) {
+
+            case CODE_SINGLE_MOVIE:
+
+                id = db.insert(
+                        MovieContract.MovieEntry.TABLE_NAME,
+                        null,
+                        values
+                );
+
+                if (id > 0) {
+                    returnUri = MovieContract.MovieEntry.buildUriWithId((int) id);
+                }
+
+                break;
+
+            case CODE_SINGLE_MOVIE_REVIEW:
+                movieId = uri.getPathSegments().get(1);
+                values.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
+
+                id = reviewDb.insert(
+                        MovieContract.ReviewEntry.TABLE_NAME,
+                        null,
+                        values
+                );
+
+                if (id > 0) {
+                    returnUri = MovieContract.ReviewEntry.buildReviewUri(id, movieId);
+                }
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return returnUri;
     }
 
     @Override

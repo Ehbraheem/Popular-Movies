@@ -1,6 +1,7 @@
 package com.example.android.popularmovies.data;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -16,6 +17,8 @@ public class MovieContract {
 
     public static final String PATH_MOVIES = "movies";
 
+    public static final String PATH_REVIEWS = "reviews";
+
     public static final class MovieEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
@@ -30,6 +33,8 @@ public class MovieContract {
         public static final String COLUMN_POSTER_URL = "poster_url";
 
         public static final String COLUMN_PLOT = "plot";
+
+        public static final String COLUMN_CATEGORY = "category";
 
         public static final String COLUMN_RELEASE_DATE = "release_date";
 
@@ -55,6 +60,28 @@ public class MovieContract {
 
         public static String createSqlSelectorForFavoriteMovies() {
             return MovieEntry.COLUMN_FAVORITE + " = ?";
+        }
+    }
+
+    public static final class ReviewEntry implements BaseColumns {
+
+        public static Uri CONTENT_URI(String movieId) {
+            return MovieEntry.CONTENT_URI.buildUpon()
+                    .appendPath(movieId)
+                    .appendPath(PATH_REVIEWS)
+                    .build();
+        }
+//        public static final Uri CONTENT_URI =
+
+
+        public static final String TABLE_NAME = "reviews";
+
+        public static final String COLUMN_CONTENT = "content";
+
+        public static final String COLUMN_AUTHOR = "author";
+
+        public static Uri buildReviewUri(long id, String movieId) {
+            return ContentUris.withAppendedId(CONTENT_URI(movieId), id);
         }
     }
 }

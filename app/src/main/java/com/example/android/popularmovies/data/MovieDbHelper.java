@@ -10,9 +10,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class MovieDbHelper extends SQLiteOpenHelper {
 
-    public static final String DATBASE_NAME = "movies.db";
+    private static final String DATBASE_NAME = "movies.db";
 
-    private static final int DATABASE_VERSION = 12;
+    private static final int DATABASE_VERSION = 14;
 
     public MovieDbHelper(Context context) {
         super(context, DATBASE_NAME, null, DATABASE_VERSION);
@@ -24,25 +24,27 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_MOVIE_TABLE =
 
-                "CREATE TABLE IF NOT EXISTS " + MovieContract.MovieEntry.TABLE_NAME + " (" +
+                "CREATE TABLE IF NOT EXISTS " + MovieContract.MovieEntry.TABLE_NAME + " ("      +
 
-                        MovieContract.MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        MovieContract.MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "   +
 
-                        MovieContract.MovieEntry.COLUMN_RELEASE_DATE + " STRING NOT NULL, "  +
+                        MovieContract.MovieEntry.COLUMN_RELEASE_DATE + " STRING NOT NULL, "     +
 
-                        MovieContract.MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0, "     +
+                        MovieContract.MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0, "       +
 
-                        MovieContract.MovieEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, "      +
+//                        MovieContract.MovieEntry.COLUMN_CATEGORY + " STRING NOT NULL, "         +
+
+                        MovieContract.MovieEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, "        +
 
                         MovieContract.MovieEntry.COLUMN_PLOT + " TEXT NOT NULL, "               +
 
-                        MovieContract.MovieEntry.COLUMN_POSTER_URL + " STRING NOT NULL, "      +
+                        MovieContract.MovieEntry.COLUMN_POSTER_URL + " STRING NOT NULL, "       +
 
-                        MovieContract.MovieEntry.COLUMN_RATING + " REAL NOT NULL, "            +
+                        MovieContract.MovieEntry.COLUMN_RATING + " REAL NOT NULL, "             +
 
-                        MovieContract.MovieEntry.COLUMN_TITLE + " STRING NOT NULL, "           +
+                        MovieContract.MovieEntry.COLUMN_TITLE + " STRING NOT NULL, "            +
 
-                        " UNIQUE ( " + MovieContract.MovieEntry.COLUMN_MOVIE_ID + " ) ON CONFLICT REPLACE);";
+                        " UNIQUE ( " + MovieContract.MovieEntry.COLUMN_MOVIE_ID + " ) ON CONFLICT IGNORE);";
 
         db.execSQL(SQL_CREATE_MOVIE_TABLE);
     }

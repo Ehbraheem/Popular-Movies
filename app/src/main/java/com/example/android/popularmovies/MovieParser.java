@@ -16,7 +16,7 @@ public class MovieParser {
 
     private static final String MOVIES_KEY = "results";
 
-    public JSONArray movies;
+    private JSONArray movies;
 
     public MovieParser(JSONObject response) {
         try {
@@ -26,7 +26,7 @@ public class MovieParser {
         }
     }
 
-    public Object[] parse (String type) throws JSONException {
+    public Object[] parse () throws JSONException {
         Object[] moviesList = new ContentValues[movies.length()];
 
 //        if (type.equals(Movies.class.getName())) {
@@ -43,10 +43,10 @@ public class MovieParser {
     }
 
     public static Movies[] parse(JSONObject object) throws JSONException {
-        return (Movies[]) new MovieParser(object).parse(Movies.class.getName());
+        return (Movies[]) new MovieParser(object).parse();
     }
 
     public static ContentValues[] makeAsContentValues(JSONObject object) throws JSONException {
-        return (ContentValues[]) new MovieParser(object).parse(ContentValues.class.getName());
+        return (ContentValues[]) new MovieParser(object).parse();
     }
 }

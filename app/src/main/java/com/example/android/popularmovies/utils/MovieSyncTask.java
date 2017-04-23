@@ -29,6 +29,7 @@ public class MovieSyncTask {
 
             ContentValues[] movieValues = MovieParser.makeAsContentValues(jsonResponse);
 
+
             if (movieValues != null) {
 
                 ContentResolver movieContentResolver = context.getContentResolver();
@@ -37,6 +38,7 @@ public class MovieSyncTask {
                         MovieContract.MovieEntry.CONTENT_URI,
                         movieValues);
             }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
