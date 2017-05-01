@@ -1,7 +1,9 @@
 package com.example.android.popularmovies.utils;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.android.popularmovies.MovieDetail;
@@ -25,6 +27,11 @@ public class ReviewSyncService extends IntentService {
 
         String movieId = intent.getStringExtra(MovieDetail.MOVIE_ID_KEY);
 
-        ReviewSyncTask.syncReviews(this, movieId);
+        syncDatas(this, movieId);
+    }
+
+    private void syncDatas(@NonNull Context context, String movieId) {
+        TrailerSyncTask.syncTrailers(context, movieId);
+        ReviewSyncTask.syncReviews(context, movieId);
     }
 }

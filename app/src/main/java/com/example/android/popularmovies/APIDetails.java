@@ -15,14 +15,15 @@ public abstract class APIDetails {
     private static final String API_KEY = BuildConfig.MOVIE_API_KEY; // Add your key here
     private static final String MOVIE_API = "http://api.themoviedb.org/3/movie/";
     private static final String IMAGE_PATH = "http://image.tmdb.org/t/p/";
+    public static final String VIDEO_THUMBNAIL = "http://img.youtube.com/vi/"
 
     /*
     @param  String [apiPath, itemPath], boolean attatchKey
     @return
      */
 
-    private static String attachExtraPathToMovie(boolean imagePath, String ... paths) {
-        String newPath = imagePath ? IMAGE_PATH : MOVIE_API;
+    private static String attachExtraPath(String baseUrl, String ... paths) {
+        String newPath = baseUrl;
 
         for (String path: paths) {
             newPath += path;
@@ -57,22 +58,27 @@ public abstract class APIDetails {
     }
 
     public static URL makePosterUrl (String posterPath, String size) {
-        String absolutePath = attachExtraPathToMovie(true, size);
+        String absolutePath = attachExtraPath(IMAGE_PATH, size);
         return makeUrl(false, absolutePath, posterPath);
     }
 
     public static URL makeResourceUrl (String type) {
-        String resourceType = attachExtraPathToMovie(false, type);
+        String resourceType = attachExtraPath(MOVIE_API, type);
         return makeUrl(true, resourceType);
     }
 
-    public static URL makeTrillerUrl(String key) {
-        String movieInfo = attachExtraPathToMovie(false, key, "/video");
+    public static URL makeTraillerUrl(String key) {
+        String movieInfo = attachExtraPath(MOVIE_API, key, "/videos");
         return makeUrl(true, movieInfo);
     }
 
     public static URL reviewUrl (String key) {
-        String reviewInfo = attachExtraPathToMovie(false,key, "/reviews");
+        String reviewInfo = attachExtraPath(MOVIE_API, key, "/reviews");
         return makeUrl(true, reviewInfo);
+    }
+
+    public static URL trailerThumbnails(String key) {
+        String videoThumbnail = attachExtraPath(VIDEO_THUMBNAIL, key);
+        return makeUrl(false, videoThumbnail);
     }
 }

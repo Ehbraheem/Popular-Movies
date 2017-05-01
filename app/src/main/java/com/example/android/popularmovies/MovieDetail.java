@@ -15,9 +15,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract;
-import com.example.android.popularmovies.data.Movies;
 import com.example.android.popularmovies.utils.ReviewSyncService;
 import com.example.android.popularmovies.utils.ReviewsAdapter;
+import com.example.android.popularmovies.utils.TrailersAdapter;
 import com.squareup.picasso.Picasso;
 
 public class MovieDetail extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -29,8 +29,10 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
     private TextView mMovieReleaseDate;
 
     private RecyclerView mReviewList;
+    private RecyclerView mTrailerList;
 
     private ReviewsAdapter mReviewAdapter;
+    private TrailersAdapter mTrailerAdapter;
 
     private static final String[] MOVIE_DETAIL_PROJECTION = {
             MovieContract.MovieEntry.COLUMN_MOVIE_ID,
@@ -47,6 +49,13 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
             MovieContract.ReviewEntry.COLUMN_CONTENT
     };
 
+    private static final String[] TRAILER_PROJECTION = {
+            MovieContract.TrailerEntry.COLUMN_NAME,
+            MovieContract.TrailerEntry.COLUMN_KEY,
+            MovieContract.TrailerEntry.COLUMN_TYPE,
+            MovieContract.TrailerEntry.COLUMN_SIZE
+    };
+
 
     public static final int INDEX_MOVIE_ID = 0;
     public static final int INDEX_MOVIE_PLOT = 1;
@@ -59,11 +68,18 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
     public static final int INDEX_REVIEW_AUTHOR  = 0;
     public static final int INDEX_REVIEW_CONTENT = 1;
 
+    public static final int INDEX_TRAILER_NAME = 0;
+    public static final int INDEX_TRAILER_KEY   = 1;
+    public static final int INDEX_TRAILER_TYPE  = 2;
+    public static final int INDEX_TRAILER_SIZE  = 3;
+
     private Uri mUri;
 
     private static final int MOVIE_DETAIL_LOADER = 445;
 
     private static final int REVIEW_LOADER = 556;
+
+    private static final int TRAILER_LOADER = 756;
 
     public static final String MOVIE_ID_KEY = "movieId";
 
@@ -82,8 +98,10 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
         mMoviePlot        = (TextView) findViewById(R.id.movie_detail_plot);
         mMovieReleaseDate = (TextView) findViewById(R.id.movie_detail_release_date);
         mReviewList       = (RecyclerView) findViewById(R.id.review_list);
+        mTrailerList      = (RecyclerView) findViewById(R.id.trailer_list);
 
-        mReviewAdapter = new ReviewsAdapter(this);
+        mReviewAdapter  = new ReviewsAdapter(this);
+        mTrailerAdapter = new TrailersAdapter(this);
 
         mUri = getIntent().getData();
 
@@ -91,13 +109,17 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
 
         movieId = mUri.getLastPathSegment();
         Intent intent = new Intent(this, ReviewSyncService.class);
+//        Intent trailerService = new Intent(this, TrailerSyncService.class);
 
         intent.putExtra(MOVIE_ID_KEY, movieId);
+//        trailerService.putExtra(MOVIE_ID_KEY, movieId);
 
         startService(intent);
+//        startService(trailerService);
 
         getSupportLoaderManager().initLoader(MOVIE_DETAIL_LOADER, null, this);
         getSupportLoaderManager().initLoader(REVIEW_LOADER, null, this);
+        getSupportLoaderManager().initLoader(TRAILER_LOADER, null, this);
 
 
 
@@ -149,7 +171,18 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
                         null,
                         null,
                         null
-                        );
+                );
+
+            case TRAILER_LOADER:
+
+                Uri trailerUri = MovieContract.TrailerEntry.CONTENT_URI(movieId);
+
+                return new CursorLoader(this,
+                        trailerUri,
+                        TRAILER_PROJECTION,
+                        null,
+                        null,
+                        null);
 
             default:
                 throw new RuntimeException("Loader Not Implemented: " + loaderId);
@@ -199,7 +232,17 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
 
                 if (data != null) {
                     mReviewAdapter.swapCursor(data);
-                    setUpReview();
+                    setUpRecyclerView("review");
+                }
+                break;
+
+            case TRAILER_LOADER:
+
+                if (data != null) {
+                    int count = data.getCount();
+                    int counting = 0;
+                    setUpRecyclerView("trailer");
+                    mTrailerAdapter.swapCursor(data);
                 }
                 break;
 
@@ -209,13 +252,19 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
 
     }
 
-    private void setUpReview() {
+    private void setUpRecyclerView(String option) {
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this,
-                LinearLayoutManager.VERTICAL, false );
-
-        mReviewList.setAdapter(mReviewAdapter);
-        mReviewList.setLayoutManager(layoutManager);
+        if (option.equals("review")) {
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this,
+                    LinearLayoutManager.VERTICAL, false );
+            mReviewList.setAdapter(mReviewAdapter);
+            mReviewList.setLayoutManager(layoutManager);
+        } else {
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this,
+                    LinearLayoutManager.VERTICAL, false );
+            mTrailerList.setAdapter(mTrailerAdapter);
+            mTrailerList.setLayoutManager(layoutManager);
+        }
     }
 
     @Override
