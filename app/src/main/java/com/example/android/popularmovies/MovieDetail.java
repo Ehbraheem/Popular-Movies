@@ -261,7 +261,7 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
             mReviewList.setLayoutManager(layoutManager);
         } else {
             LinearLayoutManager layoutManager = new LinearLayoutManager(this,
-                    LinearLayoutManager.VERTICAL, false );
+                    LinearLayoutManager.HORIZONTAL, false );
             mTrailerList.setAdapter(mTrailerAdapter);
             mTrailerList.setLayoutManager(layoutManager);
         }

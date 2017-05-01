@@ -15,13 +15,14 @@ public abstract class APIDetails {
     private static final String API_KEY = BuildConfig.MOVIE_API_KEY; // Add your key here
     private static final String MOVIE_API = "http://api.themoviedb.org/3/movie/";
     private static final String IMAGE_PATH = "http://image.tmdb.org/t/p/";
-    public static final String VIDEO_THUMBNAIL = "http://img.youtube.com/vi/"
+
+    private static final String VIDEO_THUMBNAIL = "http://img.youtube.com/vi/";
+    public static final String DEFAULT_THUMBNAIL = "hqdefault.jpg";
 
     /*
     @param  String [apiPath, itemPath], boolean attatchKey
     @return
      */
-
     private static String attachExtraPath(String baseUrl, String ... paths) {
         String newPath = baseUrl;
 
@@ -79,6 +80,6 @@ public abstract class APIDetails {
 
     public static URL trailerThumbnails(String key) {
         String videoThumbnail = attachExtraPath(VIDEO_THUMBNAIL, key);
-        return makeUrl(false, videoThumbnail);
+        return makeUrl(false, videoThumbnail, DEFAULT_THUMBNAIL);
     }
 }

@@ -7,11 +7,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.APIDetails;
 import com.example.android.popularmovies.MovieDetail;
 import com.example.android.popularmovies.R;
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by Ehbraheem on 4/23/2017.
@@ -52,24 +54,26 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
 
     public class TrailerViewHolder extends RecyclerView.ViewHolder {
 
-        final Button mTrailerName;
+        final ImageButton mTrailerThumbnails;
         final TextView mTrailerType;
 
         public TrailerViewHolder(View view) {
 
             super(view);
 
-            mTrailerName = (Button) view.findViewById(R.id.trailer_name);
+            mTrailerThumbnails = (ImageButton) view.findViewById(R.id.movie_trailer_thumbnails);
             mTrailerType = (TextView) view.findViewById(R.id.trailer_type);
         }
 
         void bind() {
 
-            String name = mCursor.getString(MovieDetail.INDEX_TRAILER_NAME);
-            String type = mCursor.getString(MovieDetail.INDEX_TRAILER_TYPE);
+            String key = mCursor.getString(MovieDetail.INDEX_TRAILER_KEY);
+            String type = mCursor.getString(MovieDetail.INDEX_TRAILER_NAME);
 
             mTrailerType.setText(type);
-            mTrailerName.setText(name);
+            Picasso.with(mContext)
+                    .load(String.valueOf(APIDetails.trailerThumbnails(key)))
+                    .into(mTrailerThumbnails);
         }
     }
 

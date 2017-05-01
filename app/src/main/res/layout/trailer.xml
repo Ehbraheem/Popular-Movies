@@ -10,8 +10,6 @@
         android:id="@+id/movies_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="@dimen/card_margin"
         android:elevation="3dp"
         card_view:layout_constraintLeft_toLeftOf="parent"
         card_view:layout_constraintRight_toRightOf="parent"
@@ -22,7 +20,7 @@
             android:layout_height="match_parent">
 
             <ImageButton
-                android:id="@+id/movies_thumbnail"
+                android:id="@+id/movie_trailer_thumbnails"
                 tools:src="@drawable/imdb"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/movies_poster_height"
@@ -35,7 +33,7 @@
                 android:layout_width="wrap_content"
                 tools:text="@string/trailer_label"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/movies_thumbnail"
+                android:layout_below="@id/movie_trailer_thumbnails"
                 android:paddingLeft="@dimen/movies_title_padding"
                 android:paddingRight="@dimen/movies_title_padding"
                 android:paddingTop="@dimen/movies_title_padding"

@@ -24,7 +24,7 @@ public class TrailerSyncTask {
 
         try {
 
-            URL trailerUrl = APIDetails.makeTrillerUrl(movieId);
+            URL trailerUrl = APIDetails.makeTraillerUrl(movieId);
 
             JSONObject trailerJson = MoviesNetworkUtils.getMoviesJsonFromUrl(trailerUrl);
 
