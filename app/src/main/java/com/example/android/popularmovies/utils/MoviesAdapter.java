@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -36,6 +37,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
     public interface ListItemClickListener {
 
         void onListItemClick(int itemIndex);
+
+        void onFavoriteItemClick(int itemIndex);
     }
 //
 //    private int nmNumberItems;
@@ -80,19 +83,23 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
             implements View.OnClickListener {
 
         final TextView mTitle;
-        final ImageView mPosterImage;
+        final ImageButton mPosterImage;
 
         final RatingBar mUserRating;
+
+        final ImageButton mFavoriteView;
 
         public MovieViewHolder(View itemView) {
 
             super(itemView);
 
             this.mTitle = (TextView) itemView.findViewById(R.id.movies_title);
-            this.mPosterImage = (ImageView) itemView.findViewById(R.id.movies_thumbnail);
+            this.mPosterImage = (ImageButton) itemView.findViewById(R.id.movies_thumbnail);
             this.mUserRating = (RatingBar) itemView.findViewById(R.id.movie_rating);
+            this.mFavoriteView = (ImageButton) itemView.findViewById(R.id.action_add_favorite);
 
-            itemView.setOnClickListener(this);
+            mPosterImage.setOnClickListener(this);
+            mFavoriteView.setOnClickListener(this);
 //            this.mPlot = (RatingBar) itemView.findViewById(R.id.movies_title);
         }
 
@@ -100,8 +107,12 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         public void onClick(View v) {
             int position = getAdapterPosition();
             mCursor.moveToPosition(position);
-            int clickedPosition = mCursor.getInt(MainActivity.INDEX_MOVIE_ID);
-            mOnclickListener.onListItemClick(clickedPosition);
+            int movieId = mCursor.getInt(MainActivity.INDEX_MOVIE_ID);
+            if (v.getId() == R.id.action_add_favorite) {
+                mOnclickListener.onFavoriteItemClick(movieId);
+            } else {
+                mOnclickListener.onListItemClick(movieId);
+            }
         }
 
         void bind(Context context) {
@@ -111,6 +122,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
             String title = mCursor.getString(MainActivity.INDEX_MOVIE_TITLE);
             String posterUrl = mCursor.getString(MainActivity.INDEX_MOVIE_POSTER_URL);
             Float rating = mCursor.getFloat(MainActivity.INDEX_MOVIE_RATING);
+            int favorite = mCursor.getInt(MainActivity.INDEX_FAVORITE);
 
             mTitle.setText(title);
 
@@ -125,6 +137,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
             Picasso.with(context)
                     .load(String.valueOf(imageUrl))
                     .into(mPosterImage);
+
+            mFavoriteView.setImageResource(favorite == 0 ? R.drawable.ic_not_liked : R.drawable.ic_liked);
         }
     }
 

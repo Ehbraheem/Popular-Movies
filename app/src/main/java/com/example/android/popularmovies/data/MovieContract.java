@@ -17,6 +17,8 @@ public class MovieContract {
 
     public static final String PATH_MOVIES = "movies";
 
+    public static final String PATH_FAVORITES = "favorites";
+
     public static final String PATH_REVIEWS = "reviews";
 
     public static final String PATH_TRAILERS = "trailers";
@@ -25,6 +27,9 @@ public class MovieContract {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_MOVIES)
+                .build();
+        public static final Uri FAVORITE_URI = CONTENT_URI.buildUpon()
+                .appendPath(PATH_FAVORITES)
                 .build();
 
 
@@ -60,6 +65,10 @@ public class MovieContract {
 
         public static String createSqlSelectorForFavoriteMovies() {
             return MovieEntry.COLUMN_FAVORITE + " = ?";
+        }
+
+        public static String createSqlSelectorForCategories() {
+            return MovieEntry.COLUMN_CATEGORY + " = ?";
         }
     }
 

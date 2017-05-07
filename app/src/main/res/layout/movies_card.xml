@@ -49,8 +49,8 @@
                 android:paddingRight="@dimen/movies_title_padding"
                 android:textSize="@dimen/movie_count" />
 
-            <ImageView
-                android:id="@+id/overflow"
+            <ImageButton
+                android:id="@+id/action_add_favorite"
                 android:layout_width="@dimen/ic_movies_overflow_width"
                 android:layout_height="@dimen/ic_movies_overflow_height"
                 android:layout_alignParentRight="true"

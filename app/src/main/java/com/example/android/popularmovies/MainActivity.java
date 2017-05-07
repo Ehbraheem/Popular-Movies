@@ -1,5 +1,6 @@
 package com.example.android.popularmovies;
 
+import android.content.ContentValues;
 import android.support.v4.app.LoaderManager;
 import android.app.ProgressDialog;
 import android.support.v4.content.CursorLoader;
@@ -39,13 +40,16 @@ public class MainActivity extends AppCompatActivity
             MovieContract.MovieEntry.COLUMN_POSTER_URL,
             MovieContract.MovieEntry.COLUMN_RATING,
             MovieContract.MovieEntry.COLUMN_TITLE,
-            MovieContract.MovieEntry.COLUMN_MOVIE_ID
+            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieEntry.COLUMN_FAVORITE,
     };
+
 
     public static final int INDEX_MOVIE_POSTER_URL = 0;
     public static final int INDEX_MOVIE_RATING = 1;
     public static final int INDEX_MOVIE_TITLE = 2;
     public static final int INDEX_MOVIE_ID = 3;
+    public static final int INDEX_FAVORITE = 4;
 
     private RecyclerView mMoviesList;
     private MoviesAdapter mMoviesAdapter;
@@ -53,11 +57,19 @@ public class MainActivity extends AppCompatActivity
     private ProgressDialog mProgressDialog;
     private TextView mErrorTextView;
 
-    private static final String POPULAR_MOVIES = "popular";
+    public static final String POPULAR_MOVIES = "popular";
 
-    private static final String MOST_RATED_MOVIES = "top_rated";
+    public static final String MOST_RATED_MOVIES = "top_rated";
+
+    public static final String FAVORITE_MOVIES = "favorites";
 
     private static final int MOVIE_LOADER_ID = 778;
+
+    private static final int FAVORITE_MOVIES_LOADER_ID = 224;
+
+    private static final int MOST_RATED_MOVIES_LOADER_ID = 445;
+
+    public static final int POPULAR_MOVIES_LOADER_ID = 667;
 
 //    private ImageView mErrorImage;
 
@@ -86,6 +98,9 @@ public class MainActivity extends AppCompatActivity
 
 
         getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
+        getSupportLoaderManager().initLoader(MOST_RATED_MOVIES_LOADER_ID, null, this);
+        getSupportLoaderManager().initLoader(FAVORITE_MOVIES_LOADER_ID, null, this);
+        getSupportLoaderManager().initLoader(POPULAR_MOVIES_LOADER_ID, null, this);
 
         Intent intent = new Intent(this, MoviesSyncService.class);
         startService(intent);
@@ -107,16 +122,19 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.action_popular) {
-            requestData(POPULAR_MOVIES);
+            requestData(POPULAR_MOVIES_LOADER_ID);
             return true;
         } else if (id == R.id.action_highest_rated) {
-            requestData(MOST_RATED_MOVIES);
+            requestData(MOST_RATED_MOVIES_LOADER_ID);
+            return true;
+        } else if (id == R.id.favorite_movies) {
+            requestData(FAVORITE_MOVIES_LOADER_ID);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void requestData(String type) {
+    private void requestData(int id) {
 
         mProgressDialog = new ProgressDialog(this);
 
@@ -130,6 +148,8 @@ public class MainActivity extends AppCompatActivity
 //        URL apiDetails = APIDetails.makeResourceUrl(type);
 //
 ////        getMovies.execute(apiDetails);
+
+        getSupportLoaderManager().restartLoader(id, null, this);
     }
 
     @Override
@@ -203,6 +223,15 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+    @Override
+    public void onFavoriteItemClick(int itemIndex) {
+        ContentValues cv = new ContentValues();
+        cv.put(MovieContract.MovieEntry.COLUMN_FAVORITE, 1);
+        Uri uriForFavoriteMovie = MovieContract.MovieEntry.buildUriWithId(itemIndex);
+
+        getContentResolver().update(uriForFavoriteMovie, cv, null, null);
+    }
+
     /*
           Initializing collapsing toolbar
           Will show and hide the toolbar title on scroll
@@ -239,11 +268,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
 
+        Uri moviesUri;
+
         switch (loaderId) {
 
             case MOVIE_LOADER_ID:
 
-                Uri moviesUri = MovieContract.MovieEntry.CONTENT_URI;
+                 moviesUri = MovieContract.MovieEntry.CONTENT_URI;
 
                 return new CursorLoader(
                         this,
@@ -253,6 +284,52 @@ public class MainActivity extends AppCompatActivity
                         null,
                         null
                 );
+
+            case FAVORITE_MOVIES_LOADER_ID:
+
+                moviesUri = MovieContract.MovieEntry.FAVORITE_URI;
+
+                return new CursorLoader(
+                        this,
+                        moviesUri,
+                        MAIN_MOVIE_PROJECTION,
+                        null,
+                        null,
+                        null
+                );
+
+            case POPULAR_MOVIES_LOADER_ID:
+
+                moviesUri = MovieContract.MovieEntry.CONTENT_URI;
+                String popularSelector = MovieContract.MovieEntry.createSqlSelectorForCategories();
+
+                String[] popularSelectorArgs = new String[]{POPULAR_MOVIES};
+
+                return new CursorLoader(
+                        this,
+                        moviesUri,
+                        MAIN_MOVIE_PROJECTION,
+                        popularSelector,
+                        popularSelectorArgs,
+                        null
+                );
+
+            case MOST_RATED_MOVIES_LOADER_ID:
+
+                moviesUri = MovieContract.MovieEntry.CONTENT_URI;
+                String mostRatedSelector = MovieContract.MovieEntry.createSqlSelectorForCategories();
+
+                String[] mostRatedSelectorArgs = new String[]{MOST_RATED_MOVIES};
+
+                return new CursorLoader(
+                        this,
+                        moviesUri,
+                        MAIN_MOVIE_PROJECTION,
+                        mostRatedSelector,
+                        mostRatedSelectorArgs,
+                        null
+                );
+
 
             default:
                 throw new RuntimeException("Loader Not Implemented: " + loaderId);

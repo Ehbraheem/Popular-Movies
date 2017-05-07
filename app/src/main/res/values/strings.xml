@@ -8,6 +8,7 @@
     <string name="highest_rated">Highest Rated</string>
     <string name="reviews">Reviews</string>
 
+    <string name="show_favorites">Favorites</string>
     <string name="action_add_favorite">Add to Favourites</string>
 
     <string name="authority">com.example.android.popularmovies</string>

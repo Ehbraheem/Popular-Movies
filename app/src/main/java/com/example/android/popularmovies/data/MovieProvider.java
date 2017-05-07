@@ -393,13 +393,15 @@ public class MovieProvider extends ContentProvider {
             case CODE_SINGLE_MOVIE:
 
                 String movieID = uri.getLastPathSegment();
-                String[] selectionArgument = makeSelectionArgs(movieID);
+                String movieSelection = MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ";
+
+                String[] selectionArguments = makeSelectionArgs(movieID);
 
                 numUpdated = movieDbHelper.getWritableDatabase().update(
                         MovieContract.MovieEntry.TABLE_NAME,
                         values,
-                        MovieContract.MovieEntry._ID + " = ?",
-                        selectionArgument
+                        movieSelection,
+                        selectionArguments
                 );
                 break;
 
@@ -413,18 +415,21 @@ public class MovieProvider extends ContentProvider {
                 );
                 break;
 
-            case CODE_FAVORITE_MOVIES:
-
-                String favorite = MovieContract.MovieEntry.createSqlSelectorForFavoriteMovies();
-                String[] favaoriteSelector = makeSelectionArgs(1);
-
-                numUpdated = movieDbHelper.getWritableDatabase().update(
-                        MovieContract.MovieEntry.TABLE_NAME,
-                        values,
-                        favorite,
-                        favaoriteSelector
-                );
-                break;
+//            case CODE_FAVORITE_MOVIES:
+//
+//                String movieId = uri.getLastPathSegment();
+//
+//                String movieSelection = MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ";
+//
+//                String[] selectionArguments = makeSelectionArgs(movieId);
+//
+//                numUpdated = movieDbHelper.getWritableDatabase().update(
+//                        MovieContract.MovieEntry.TABLE_NAME,
+//                        values,
+//                        movieSelection,
+//                        selectionArguments
+//                );
+//                break;
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
