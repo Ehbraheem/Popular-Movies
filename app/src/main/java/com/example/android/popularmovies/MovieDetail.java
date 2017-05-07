@@ -1,5 +1,6 @@
 package com.example.android.popularmovies;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -20,7 +21,9 @@ import com.example.android.popularmovies.utils.ReviewsAdapter;
 import com.example.android.popularmovies.utils.TrailersAdapter;
 import com.squareup.picasso.Picasso;
 
-public class MovieDetail extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MovieDetail extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor>,
+        TrailersAdapter.TrailerVideoClickListener {
 
     private TextView mMovieTitle;
     private ImageView mMoviePoster;
@@ -101,7 +104,7 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
         mTrailerList      = (RecyclerView) findViewById(R.id.trailer_list);
 
         mReviewAdapter  = new ReviewsAdapter(this);
-        mTrailerAdapter = new TrailersAdapter(this);
+        mTrailerAdapter = new TrailersAdapter(this, this);
 
         mUri = getIntent().getData();
 
@@ -269,5 +272,18 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    @Override
+    public void openYoutube(String key) {
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + key));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://www.youtube.com/watch?v=" + key));
+
+        try {
+            startActivity(appIntent);
+        } catch (ActivityNotFoundException e) {
+            startActivity(webIntent);
+        }
     }
 }

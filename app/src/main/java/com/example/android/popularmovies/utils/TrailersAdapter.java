@@ -23,9 +23,15 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
 
     private Cursor mCursor;
     private Context mContext;
+    private TrailerVideoClickListener mYoutubeListener;
 
-    public TrailersAdapter(@NonNull Context context) {
+    public interface TrailerVideoClickListener {
+        void openYoutube(@NonNull String key);
+    }
+
+    public TrailersAdapter(@NonNull Context context, TrailerVideoClickListener youtubeListener) {
         mContext = context;
+        mYoutubeListener = youtubeListener;
     }
 
     @Override
@@ -52,7 +58,8 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
         return mCursor.getCount();
     }
 
-    public class TrailerViewHolder extends RecyclerView.ViewHolder {
+    public class TrailerViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener{
 
         final ImageButton mTrailerThumbnails;
         final TextView mTrailerType;
@@ -63,6 +70,8 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
 
             mTrailerThumbnails = (ImageButton) view.findViewById(R.id.movie_trailer_thumbnails);
             mTrailerType = (TextView) view.findViewById(R.id.trailer_type);
+
+            mTrailerThumbnails.setOnClickListener(this);
         }
 
         void bind() {
@@ -74,6 +83,14 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
             Picasso.with(mContext)
                     .load(String.valueOf(APIDetails.trailerThumbnails(key)))
                     .into(mTrailerThumbnails);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition();
+            mCursor.moveToPosition(position);
+            String key = mCursor.getString(MovieDetail.INDEX_TRAILER_KEY);
+            mYoutubeListener.openYoutube(key);
         }
     }
 
