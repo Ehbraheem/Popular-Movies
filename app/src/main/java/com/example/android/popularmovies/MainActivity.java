@@ -79,8 +79,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
         collapsingToolbar();
 
         mMoviesList    = (RecyclerView) findViewById(R.id.movies_list);
@@ -98,9 +98,6 @@ public class MainActivity extends AppCompatActivity
 
 
         getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
-        getSupportLoaderManager().initLoader(MOST_RATED_MOVIES_LOADER_ID, null, this);
-        getSupportLoaderManager().initLoader(FAVORITE_MOVIES_LOADER_ID, null, this);
-        getSupportLoaderManager().initLoader(POPULAR_MOVIES_LOADER_ID, null, this);
 
         Intent intent = new Intent(this, MoviesSyncService.class);
         startService(intent);

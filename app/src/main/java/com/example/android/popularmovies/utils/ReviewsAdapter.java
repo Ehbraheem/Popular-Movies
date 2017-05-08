@@ -20,9 +20,11 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
 
     private Cursor mCursor;
     private Context mContext;
+    private String numOfLines;
 
-    public ReviewsAdapter(@NonNull Context context) {
+    public ReviewsAdapter(@NonNull Context context, @NonNull String lineNumber) {
         mContext = context;
+        numOfLines = lineNumber;
     }
 
 
@@ -69,6 +71,10 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
             String content = mCursor.getString(MovieDetail.INDEX_REVIEW_CONTENT);
             String author  = mCursor.getString(MovieDetail.INDEX_REVIEW_AUTHOR);
 
+            if (!(numOfLines.equals(mContext.getString(R.string.length_value_default)))) {
+                int lineNumber = Integer.parseInt(numOfLines);
+                mReview.setMaxLines(lineNumber);
+            }
             mReview.setText(content);
             mAuthor.setText(author);
         }

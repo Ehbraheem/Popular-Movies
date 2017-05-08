@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="pref_quality_list">
+        <item>@string/video_low_quality</item>
+        <item>@string/video_high_quality</item>
+    </array>
+
+    <array name="pref_video_quality_values">
+        <item>@string/pref_low_hd</item>
+        <item>@string/pref_high_hd</item>
+    </array>
+
+    <array name="pref_review_lenght_titles">
+        <item>@string/length_3</item>
+        <item>@string/lenght_6</item>
+        <item>@string/lenght_9</item>
+        <item>@string/lenght_default</item>
+    </array>
+
+    <array name="pref_reviews_length_values">
+        <item>@string/length_value_3</item>
+        <item>@string/length_value_6</item>
+        <item>@string/length_value_9</item>
+        <item>@string/length_value_default</item>
+    </array>
+</resources>

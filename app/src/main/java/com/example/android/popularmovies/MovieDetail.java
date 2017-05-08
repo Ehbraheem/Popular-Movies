@@ -2,15 +2,21 @@ package com.example.android.popularmovies;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -23,7 +29,8 @@ import com.squareup.picasso.Picasso;
 
 public class MovieDetail extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor>,
-        TrailersAdapter.TrailerVideoClickListener {
+        TrailersAdapter.TrailerVideoClickListener,
+        SharedPreferences.OnSharedPreferenceChangeListener{
 
     private TextView mMovieTitle;
     private ImageView mMoviePoster;
@@ -86,14 +93,26 @@ public class MovieDetail extends AppCompatActivity
 
     public static final String MOVIE_ID_KEY = "movieId";
 
+    private static final String MOVIES_LIFECYCLE_CALLBACK  = "movies_list";
+
     private String movieId;
+
+    private SharedPreferences sharedPreferences;
+
+    private boolean showAllVideos;
+    private int videoQuality;
+    private String numOfLines;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
-//        this.getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ActionBar actionBar = this.getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         mMoviePoster      = (ImageView) findViewById(R.id.movie_detail_thumbnail);
         mMovieTitle       = (TextView) findViewById(R.id.movie_detail_title);
@@ -103,7 +122,7 @@ public class MovieDetail extends AppCompatActivity
         mReviewList       = (RecyclerView) findViewById(R.id.review_list);
         mTrailerList      = (RecyclerView) findViewById(R.id.trailer_list);
 
-        mReviewAdapter  = new ReviewsAdapter(this);
+        mReviewAdapter  = new ReviewsAdapter(this, numOfLines);
         mTrailerAdapter = new TrailersAdapter(this, this);
 
         mUri = getIntent().getData();
@@ -124,8 +143,7 @@ public class MovieDetail extends AppCompatActivity
         getSupportLoaderManager().initLoader(REVIEW_LOADER, null, this);
         getSupportLoaderManager().initLoader(TRAILER_LOADER, null, this);
 
-
-
+        setUpSharedPreferences();
 //        if (intent.hasExtra(Intent.EXTRA_TEXT)) {
 //            Bundle data = intent.getExtras();
 //            Movies movie = data.getParcelable(Intent.EXTRA_TEXT);
@@ -149,6 +167,29 @@ public class MovieDetail extends AppCompatActivity
 //                        .into(mMoviePoster);
 //            }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.movie_details_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_open_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -180,11 +221,22 @@ public class MovieDetail extends AppCompatActivity
 
                 Uri trailerUri = MovieContract.TrailerEntry.CONTENT_URI(movieId);
 
+                String selection;
+                String[] selectionAgrs;
+
+                if (showAllVideos) {
+                    selection = MovieContract.TrailerEntry.COLUMN_TYPE + " = ?";
+                    selectionAgrs = makeSelectionArgs("Trailer");
+                } else {
+                    selection = null;
+                    selectionAgrs = null;
+                }
+
                 return new CursorLoader(this,
                         trailerUri,
                         TRAILER_PROJECTION,
-                        null,
-                        null,
+                        selection,
+                        selectionAgrs,
                         null);
 
             default:
@@ -242,8 +294,6 @@ public class MovieDetail extends AppCompatActivity
             case TRAILER_LOADER:
 
                 if (data != null) {
-                    int count = data.getCount();
-                    int counting = 0;
                     setUpRecyclerView("trailer");
                     mTrailerAdapter.swapCursor(data);
                 }
@@ -285,5 +335,37 @@ public class MovieDetail extends AppCompatActivity
         } catch (ActivityNotFoundException e) {
             startActivity(webIntent);
         }
+    }
+
+    private String[] makeSelectionArgs(String ... select) {
+        return select;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pref_all_videos))) {
+            showAllVideos = sharedPreferences.getBoolean(getString(R.string.pref_all_videos),
+                    getResources().getBoolean(R.bool.show_all_videos));
+        } else if (key.equals(getString(R.string.pref_video_quality))) {
+            videoQuality = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_video_quality),
+                    getString(R.string.pref_low_hd)));
+        } else if (key.equals(getString(R.string.pref_reviews_length))) {
+            numOfLines = sharedPreferences.getString(getString(R.string.pref_reviews_length),
+                    getString(R.string.length_value_3));
+        }
+    }
+
+    private void setUpSharedPreferences() {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        showAllVideos = sharedPreferences.getBoolean(getString(R.string.pref_all_videos),
+                getResources().getBoolean(R.bool.show_all_videos));
+
+        videoQuality = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_video_quality),
+                getString(R.string.pref_low_hd)));
+
+        numOfLines = sharedPreferences.getString(getString(R.string.pref_reviews_length),
+                getString(R.string.length_value_3));
+
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 }

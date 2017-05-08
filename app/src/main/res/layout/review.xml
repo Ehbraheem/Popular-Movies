@@ -30,6 +30,8 @@
                 android:paddingBottom="@dimen/movie_count_padding_bottom"
                 android:paddingLeft="@dimen/movies_title_padding"
                 android:paddingRight="@dimen/movies_title_padding"
+                android:ellipsize="end"
+                android:scrollHorizontally="true"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
