@@ -1,24 +1,11 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- A 'parent' preference, which enables/disables child preferences (below)
-         when checked/unchecked. -->
-    <!--<SwitchPreference-->
-        <!--android:defaultValue="true"-->
-        <!--android:key="notifications_new_message"-->
-        <!--android:title="@string/pref_title_new_message_notifications" />-->
-
     <ListPreference
-        android:defaultValue="@string/pref_low_hd"
+        android:defaultValue="@string/length_value_3"
         android:entries="@array/pref_review_lenght_titles"
         android:entryValues="@array/pref_reviews_length_values"
         android:key="@string/pref_reviews_length"
         android:title="@string/pref_title_review_text_length"
         />
-    <!--&lt;!&ndash; NOTE: This preference will be enabled only when the checkbox above is checked. &ndash;&gt;-->
-    <!--<SwitchPreference-->
-        <!--android:defaultValue="true"-->
-        <!--android:dependency="notifications_new_message"-->
-        <!--android:key="notifications_new_message_vibrate"-->
-        <!--android:title="@string/pref_title_vibrate" />-->
 
 </PreferenceScreen>

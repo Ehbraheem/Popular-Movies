@@ -1,6 +1,12 @@
 package com.example.android.popularmovies;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.app.ProgressDialog;
 import android.support.v4.content.CursorLoader;
@@ -16,7 +22,6 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,7 +39,7 @@ import org.json.JSONObject;
 
 
 public class MainActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Cursor>, APICallback, MoviesAdapter.ListItemClickListener{
+        implements LoaderManager.LoaderCallbacks<Cursor>, MoviesAdapter.ListItemClickListener{
 
     public static final String[] MAIN_MOVIE_PROJECTION = {
             MovieContract.MovieEntry.COLUMN_POSTER_URL,
@@ -56,6 +61,7 @@ public class MainActivity extends AppCompatActivity
     private GridLayoutManager mLayoutManager;
     private ProgressDialog mProgressDialog;
     private TextView mErrorTextView;
+    private CoordinatorLayout mCoordinatorLayout;
 
     public static final String POPULAR_MOVIES = "popular";
 
@@ -70,6 +76,8 @@ public class MainActivity extends AppCompatActivity
     private static final int MOST_RATED_MOVIES_LOADER_ID = 445;
 
     public static final int POPULAR_MOVIES_LOADER_ID = 667;
+
+    private static final String NO_NETWORK = "You're not connected to any network";
 
 //    private ImageView mErrorImage;
 
@@ -88,6 +96,8 @@ public class MainActivity extends AppCompatActivity
         mErrorTextView = (TextView) findViewById(R.id.error_textview);
 //        mErrorImage    = (ImageView) findViewById(R.id.error_image);
 
+        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_content);
+
         mMoviesList.setHasFixedSize(true);
 
         mProgressDialog = new ProgressDialog(this);
@@ -99,6 +109,39 @@ public class MainActivity extends AppCompatActivity
 
         getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
 
+        checkNetWorkAndStartService();
+    }
+
+    private void checkNetWorkAndStartService() {
+
+            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            final NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+            if (networkInfo != null) {
+                startMovieService();
+            } else {
+
+
+                mErrorTextView.setVisibility(View.VISIBLE);
+                mErrorTextView.setText(NO_NETWORK);
+                Snackbar snackbar = Snackbar.make(mCoordinatorLayout,
+                        "Unable to sync movies! ", Snackbar.LENGTH_LONG);
+
+                snackbar.setAction("RETRY", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (networkInfo != null) {
+                            startMovieService();
+                        } else return;
+                    }
+                });
+
+                snackbar.setActionTextColor(Color.RED);
+                snackbar.show();
+            }
+    }
+
+    private void startMovieService() {
         Intent intent = new Intent(this, MoviesSyncService.class);
         startService(intent);
     }
@@ -147,39 +190,6 @@ public class MainActivity extends AppCompatActivity
 ////        getMovies.execute(apiDetails);
 
         getSupportLoaderManager().restartLoader(id, null, this);
-    }
-
-    @Override
-    public void handleData(JSONObject object) throws JSONException {
-
-        mProgressDialog.cancel();
-
-        if (object.has("error")) {
-
-            mMoviesList.setVisibility(View.INVISIBLE);
-
-//            mErrorImage.setVisibility(View.VISIBLE);
-
-            String message = object.getString("error");
-
-            mErrorTextView.setVisibility(View.VISIBLE);
-            mErrorTextView.setText(message);
-
-
-        } else {
-
-            mMoviesAdapter = new MoviesAdapter(this, this);
-
-            setUpRecyclerView();
-
-
-        }
-
-
-//        for (Movies movie : movies) {
-//
-//            mDisplayDetails.append(movie.plot + "/n/n/n");
-//        }
     }
 
     private  int convertDPtoPixel(int dp) {

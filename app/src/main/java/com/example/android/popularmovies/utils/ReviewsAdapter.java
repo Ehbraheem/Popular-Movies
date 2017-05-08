@@ -22,9 +22,8 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
     private Context mContext;
     private String numOfLines;
 
-    public ReviewsAdapter(@NonNull Context context, @NonNull String lineNumber) {
+    public ReviewsAdapter(@NonNull Context context) {
         mContext = context;
-        numOfLines = lineNumber;
     }
 
 
@@ -82,6 +81,11 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
 
     public void swapCursor(Cursor cursor) {
         mCursor = cursor;
+        notifyDataSetChanged();
+    }
+
+    public void swapNumberOfText(String numOfLine) {
+        numOfLines = numOfLine;
         notifyDataSetChanged();
     }
 }

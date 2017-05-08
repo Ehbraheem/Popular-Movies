@@ -1,10 +1,15 @@
 package com.example.android.popularmovies;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -17,8 +22,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract;
@@ -43,6 +50,8 @@ public class MovieDetail extends AppCompatActivity
 
     private ReviewsAdapter mReviewAdapter;
     private TrailersAdapter mTrailerAdapter;
+
+    private ScrollView mScrollView;
 
     private static final String[] MOVIE_DETAIL_PROJECTION = {
             MovieContract.MovieEntry.COLUMN_MOVIE_ID,
@@ -121,29 +130,26 @@ public class MovieDetail extends AppCompatActivity
         mMovieReleaseDate = (TextView) findViewById(R.id.movie_detail_release_date);
         mReviewList       = (RecyclerView) findViewById(R.id.review_list);
         mTrailerList      = (RecyclerView) findViewById(R.id.trailer_list);
+        mScrollView       = (ScrollView) findViewById(R.id.scrollView);
 
-        mReviewAdapter  = new ReviewsAdapter(this, numOfLines);
+        mReviewAdapter  = new ReviewsAdapter(this);
         mTrailerAdapter = new TrailersAdapter(this, this);
+
+        setUpSharedPreferences();
 
         mUri = getIntent().getData();
 
         if (mUri == null) throw new NullPointerException("URI for MovieDetail cannot be null");
 
         movieId = mUri.getLastPathSegment();
-        Intent intent = new Intent(this, ReviewSyncService.class);
-//        Intent trailerService = new Intent(this, TrailerSyncService.class);
 
-        intent.putExtra(MOVIE_ID_KEY, movieId);
-//        trailerService.putExtra(MOVIE_ID_KEY, movieId);
-
-        startService(intent);
-//        startService(trailerService);
 
         getSupportLoaderManager().initLoader(MOVIE_DETAIL_LOADER, null, this);
         getSupportLoaderManager().initLoader(REVIEW_LOADER, null, this);
         getSupportLoaderManager().initLoader(TRAILER_LOADER, null, this);
 
-        setUpSharedPreferences();
+        checkNetWorkAndStartService();
+
 //        if (intent.hasExtra(Intent.EXTRA_TEXT)) {
 //            Bundle data = intent.getExtras();
 //            Movies movie = data.getParcelable(Intent.EXTRA_TEXT);
@@ -167,6 +173,48 @@ public class MovieDetail extends AppCompatActivity
 //                        .into(mMoviePoster);
 //            }
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    private void checkNetWorkAndStartService() {
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (networkInfo != null) {
+            startTrailerAndReviewService();
+        } else {
+
+            Snackbar snackbar = Snackbar.make(mScrollView,
+                    "Unable to sync reviews and trailers! ", Snackbar.LENGTH_LONG);
+
+            snackbar.setAction("RETRY", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (networkInfo != null) {
+                        startTrailerAndReviewService();
+                    } else return;
+                }
+            });
+
+            snackbar.setActionTextColor(Color.RED);
+            snackbar.show();
+        }
+    }
+
+    private void startTrailerAndReviewService() {
+        Intent intent = new Intent(this, ReviewSyncService.class);
+//        Intent trailerService = new Intent(this, TrailerSyncService.class);
+
+        intent.putExtra(MOVIE_ID_KEY, movieId);
+//        trailerService.putExtra(MOVIE_ID_KEY, movieId);
+
+        startService(intent);
+//        startService(trailerService);
     }
 
     @Override
@@ -352,6 +400,8 @@ public class MovieDetail extends AppCompatActivity
         } else if (key.equals(getString(R.string.pref_reviews_length))) {
             numOfLines = sharedPreferences.getString(getString(R.string.pref_reviews_length),
                     getString(R.string.length_value_3));
+
+            mReviewAdapter.swapNumberOfText(numOfLines);
         }
     }
 
@@ -366,6 +416,7 @@ public class MovieDetail extends AppCompatActivity
         numOfLines = sharedPreferences.getString(getString(R.string.pref_reviews_length),
                 getString(R.string.length_value_3));
 
+        mReviewAdapter.swapNumberOfText(numOfLines);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 }

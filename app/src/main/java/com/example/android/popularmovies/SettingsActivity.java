@@ -32,8 +32,7 @@ import java.util.List;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity
-        implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsActivity extends AppCompatPreferenceActivity {
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -71,20 +70,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity
             }
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
-
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .unregisterOnSharedPreferenceChangeListener(this);
     }
 
     /**
@@ -125,23 +120,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                 || ReviewPreferenceFragment.class.getName().equals(fragmentName);
     }
 
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Preference preference = findPreference(key);
-        if (null != preference) {
-            if (!(preference instanceof CheckBoxPreference)) {
-                String value = sharedPreferences.getString(preference.getKey(), "");
-                setPreferenceSummary(preference, value);
-            }
-        }
-    }
     /**
      * This fragment shows general preferences only. It is used when the
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class TrailerPreferenceFragment extends PreferenceFragment {
+    public static class TrailerPreferenceFragment extends PreferenceFragment
+            implements SharedPreferences.OnSharedPreferenceChangeListener {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -153,7 +138,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(getPreferenceScreen());
-            bindPreferenceSummaryToValue(getPreferenceScreen());
+            PreferenceManager.getDefaultSharedPreferences(getActivity())
+                    .registerOnSharedPreferenceChangeListener(this);
+        }
+
+        @Override
+        public void onDestroy() {
+            super.onDestroy();
+            PreferenceManager.getDefaultSharedPreferences(getActivity())
+                    .unregisterOnSharedPreferenceChangeListener(this);
         }
 
         @Override
@@ -165,6 +158,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity
             }
             return super.onOptionsItemSelected(item);
         }
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            Preference preference = findPreference(key);
+            if (null != preference) {
+                if (!((preference instanceof CheckBoxPreference) || (preference instanceof SwitchPreference))) {
+                    String value = sharedPreferences.getString(preference.getKey(), "");
+                    setPreferenceSummary(preference, value);
+                }
+            }
+        }
     }
 
     /**
@@ -172,7 +176,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class ReviewPreferenceFragment extends PreferenceFragment {
+    public static class ReviewPreferenceFragment extends PreferenceFragment
+            implements SharedPreferences.OnSharedPreferenceChangeListener {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -184,6 +189,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(getPreferenceScreen());
+
+            PreferenceManager.getDefaultSharedPreferences(getActivity())
+                    .registerOnSharedPreferenceChangeListener(this);
+        }
+
+        public void onDestroy() {
+            super.onDestroy();
+            PreferenceManager.getDefaultSharedPreferences(getActivity())
+                    .unregisterOnSharedPreferenceChangeListener(this);
         }
 
         @Override
@@ -194,6 +208,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                 return true;
             }
             return super.onOptionsItemSelected(item);
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            Preference preference = findPreference(key);
+            if (null != preference) {
+                if (!((preference instanceof CheckBoxPreference) || (preference instanceof SwitchPreference))) {
+                    String value = sharedPreferences.getString(preference.getKey(), "");
+                    setPreferenceSummary(preference, value);
+                }
+            }
         }
     }
 }
