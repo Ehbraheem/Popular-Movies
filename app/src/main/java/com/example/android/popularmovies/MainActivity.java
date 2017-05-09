@@ -32,6 +32,7 @@ import android.widget.TextView;
 import com.example.android.popularmovies.data.MovieContract;
 import com.example.android.popularmovies.utils.APICallback;
 import com.example.android.popularmovies.utils.MoviesAdapter;
+import com.example.android.popularmovies.utils.MoviesNetworkUtils;
 import com.example.android.popularmovies.utils.MoviesSyncService;
 
 import org.json.JSONException;
@@ -114,10 +115,8 @@ public class MainActivity extends AppCompatActivity
 
     private void checkNetWorkAndStartService() {
 
-            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            final NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-
-            if (networkInfo != null) {
+        boolean connected = MoviesNetworkUtils.networkCheck(this);
+            if (connected) {
                 startMovieService();
             } else {
 
@@ -130,7 +129,7 @@ public class MainActivity extends AppCompatActivity
                 snackbar.setAction("RETRY", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (networkInfo != null) {
+                        if (MoviesNetworkUtils.networkCheck(getApplicationContext())) {
                             startMovieService();
                         } else return;
                     }

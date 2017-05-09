@@ -21,6 +21,9 @@ public class MoviesSyncService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        MovieSyncTask.syncMovies(this);
+
+        if (MoviesNetworkUtils.networkCheck(this)) {
+            MovieSyncTask.syncMovies(this);
+        } else return;
     }
 }

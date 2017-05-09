@@ -27,7 +27,9 @@ public class ReviewSyncService extends IntentService {
 
         String movieId = intent.getStringExtra(MovieDetail.MOVIE_ID_KEY);
 
-        syncDatas(this, movieId);
+        if (MoviesNetworkUtils.networkCheck(this)) {
+            syncDatas(this, movieId);
+        } else return;
     }
 
     private void syncDatas(@NonNull Context context, String movieId) {

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -29,6 +30,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract;
+import com.example.android.popularmovies.utils.MoviesNetworkUtils;
 import com.example.android.popularmovies.utils.ReviewSyncService;
 import com.example.android.popularmovies.utils.ReviewsAdapter;
 import com.example.android.popularmovies.utils.TrailersAdapter;
@@ -54,7 +56,6 @@ public class MovieDetail extends AppCompatActivity
     private ScrollView mScrollView;
 
     private static final String[] MOVIE_DETAIL_PROJECTION = {
-            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieEntry.COLUMN_PLOT,
             MovieContract.MovieEntry.COLUMN_FAVORITE,
             MovieContract.MovieEntry.COLUMN_POSTER_URL,
@@ -70,27 +71,22 @@ public class MovieDetail extends AppCompatActivity
 
     private static final String[] TRAILER_PROJECTION = {
             MovieContract.TrailerEntry.COLUMN_NAME,
-            MovieContract.TrailerEntry.COLUMN_KEY,
-            MovieContract.TrailerEntry.COLUMN_TYPE,
-            MovieContract.TrailerEntry.COLUMN_SIZE
+            MovieContract.TrailerEntry.COLUMN_KEY
     };
 
 
-    public static final int INDEX_MOVIE_ID = 0;
-    public static final int INDEX_MOVIE_PLOT = 1;
-    public static final int INDEX_MOVIE_FAVORITE = 2;
-    public static final int INDEX_MOVIE_POSTER_URL = 3;
-    public static final int INDEX_MOVIE_RATING = 4;
-    public static final int INDEX_MOVIE_RELEASE_DATE = 5;
-    public static final int INDEX_MOVIE_TITLE = 6;
+    public static final int INDEX_MOVIE_PLOT = 0;
+    public static final int INDEX_MOVIE_FAVORITE = 1;
+    public static final int INDEX_MOVIE_POSTER_URL = 2;
+    public static final int INDEX_MOVIE_RATING = 3;
+    public static final int INDEX_MOVIE_RELEASE_DATE = 4;
+    public static final int INDEX_MOVIE_TITLE = 5;
 
     public static final int INDEX_REVIEW_AUTHOR  = 0;
     public static final int INDEX_REVIEW_CONTENT = 1;
 
     public static final int INDEX_TRAILER_NAME = 0;
     public static final int INDEX_TRAILER_KEY   = 1;
-    public static final int INDEX_TRAILER_TYPE  = 2;
-    public static final int INDEX_TRAILER_SIZE  = 3;
 
     private Uri mUri;
 
@@ -102,7 +98,13 @@ public class MovieDetail extends AppCompatActivity
 
     public static final String MOVIE_ID_KEY = "movieId";
 
-    private static final String MOVIES_LIFECYCLE_CALLBACK  = "movies_list";
+    private static final String MOVIE_TITLE_KEY  = "title";
+    private static final String MOVIE_PLOT_KEY = "plot";
+    private static final String MOVIE_RELEASE_DATE_KEY = "release_date";
+    private static final String MOVIE_POSTER_URL_KEY = "poster_url";
+    private static final String MOVIE_RATING_KEY = "rating";
+
+    private String posterUrl;
 
     private String movieId;
 
@@ -144,7 +146,12 @@ public class MovieDetail extends AppCompatActivity
         movieId = mUri.getLastPathSegment();
 
 
-        getSupportLoaderManager().initLoader(MOVIE_DETAIL_LOADER, null, this);
+        if (savedInstanceState != null) {
+            restoreFromState(savedInstanceState);
+        } else {
+            getSupportLoaderManager().restartLoader(MOVIE_DETAIL_LOADER, null, this);
+        }
+
         getSupportLoaderManager().initLoader(REVIEW_LOADER, null, this);
         getSupportLoaderManager().initLoader(TRAILER_LOADER, null, this);
 
@@ -175,17 +182,47 @@ public class MovieDetail extends AppCompatActivity
 
     }
 
+    private void restoreFromState(Bundle savedInstanceState) {
+        String imageSize = "w500/";
+
+        String title = savedInstanceState.getString(MOVIE_TITLE_KEY);
+        String plot = savedInstanceState.getString(MOVIE_PLOT_KEY);
+        String releaseDate = savedInstanceState.getString(MOVIE_RELEASE_DATE_KEY);
+        Float rating = savedInstanceState.getFloat(MOVIE_RATING_KEY);
+        String poster = savedInstanceState.getString(MOVIE_POSTER_URL_KEY);
+        mMovieTitle.setText(title);
+
+        mMoviePlot.setText(plot);
+        mMovieReleaseDate.setText(releaseDate);
+
+        rating /= 2;
+        mMovieRating.setNumStars(5);
+        mMovieRating.setStepSize(0.5f);
+        mMovieRating.setRating(rating);
+
+        Picasso.with(this)
+                .load(String.valueOf(APIDetails.makePosterUrl(poster,imageSize)))
+                .into(mMoviePoster);
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        String title = mMovieTitle.getText().toString();
+        String plot  = mMoviePlot.getText().toString();
+        String releaseDate = mMovieReleaseDate.getText().toString();
+        Float rating = mMovieRating.getRating();
+
+        outState.putString(MOVIE_TITLE_KEY, title);
+        outState.putString(MOVIE_PLOT_KEY, plot);
+        outState.putString(MOVIE_RELEASE_DATE_KEY, releaseDate);
+        outState.putString(MOVIE_POSTER_URL_KEY, posterUrl);
+        outState.putFloat(MOVIE_RATING_KEY, rating);
     }
 
     private void checkNetWorkAndStartService() {
-
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        final NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-
-        if (networkInfo != null) {
+        final boolean connected = MoviesNetworkUtils.networkCheck(this);
+        if (connected) {
             startTrailerAndReviewService();
         } else {
 
@@ -195,7 +232,7 @@ public class MovieDetail extends AppCompatActivity
             snackbar.setAction("RETRY", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (networkInfo != null) {
+                    if (MoviesNetworkUtils.networkCheck(getApplicationContext())) {
                         startTrailerAndReviewService();
                     } else return;
                 }
@@ -222,7 +259,6 @@ public class MovieDetail extends AppCompatActivity
         super.onDestroy();
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -273,8 +309,9 @@ public class MovieDetail extends AppCompatActivity
                 String[] selectionAgrs;
 
                 if (showAllVideos) {
-                    selection = MovieContract.TrailerEntry.COLUMN_TYPE + " = ?";
-                    selectionAgrs = makeSelectionArgs("Trailer");
+                    selection = MovieContract.TrailerEntry.COLUMN_TYPE + " , " +
+                            MovieContract.TrailerEntry.COLUMN_SIZE + " = ?, ? ";
+                    selectionAgrs = makeSelectionArgs("Trailer", String.valueOf(videoQuality));
                 } else {
                     selection = null;
                     selectionAgrs = null;
@@ -310,7 +347,7 @@ public class MovieDetail extends AppCompatActivity
                 String plot = data.getString(INDEX_MOVIE_PLOT);
                 String releaseDate = data.getString(INDEX_MOVIE_RELEASE_DATE);
                 Float rating = data.getFloat(INDEX_MOVIE_RATING);
-                String posterUrl = data.getString(INDEX_MOVIE_POSTER_URL);
+                posterUrl = data.getString(INDEX_MOVIE_POSTER_URL);
                 int favorite = data.getInt(INDEX_MOVIE_FAVORITE);
 
                 mMovieTitle.setText(title);
