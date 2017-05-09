@@ -1,10 +1,7 @@
 package com.example.android.popularmovies;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
@@ -30,13 +27,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieContract;
-import com.example.android.popularmovies.utils.APICallback;
 import com.example.android.popularmovies.utils.MoviesAdapter;
 import com.example.android.popularmovies.utils.MoviesNetworkUtils;
 import com.example.android.popularmovies.utils.MoviesSyncService;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 
 public class MainActivity extends AppCompatActivity
