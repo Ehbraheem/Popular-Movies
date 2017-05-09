@@ -65,12 +65,12 @@
                 </LinearLayout>
             </RelativeLayout>
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+            <!--<android.support.v7.widget.Toolbar-->
+                <!--android:id="@+id/toolbar"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="?attr/actionBarSize"-->
+                <!--app:layout_collapseMode="pin"-->
+                <!--app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />-->
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -81,17 +81,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/viewBg"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <!--<ImageView-->
-            <!--android:visibility="invisible"-->
-            <!--android:src="@drawable/network"-->
-            <!--android:id="@+id/error_image"-->
-            <!--android:fitsSystemWindows="true"-->
-            <!--android:scaleType="centerInside"-->
-            <!--app:layout_collapseMode="parallax"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content" />-->
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" >
 
         <TextView
             android:visibility="invisible"

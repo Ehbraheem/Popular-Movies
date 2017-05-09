@@ -3,6 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/favorite_movies"
+        android:title="@string/show_favorites"
+        android:orderInCategory="1"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/action_popular"
         android:title="@string/most_popular"
         android:orderInCategory="1"

@@ -23,14 +23,34 @@
             </intent-filter>
         </activity>
         <activity
+            android:launchMode="singleTop"
             android:name=".MovieDetail"
-            android:parentActivityName=".MainActivity"
-            android:label="@string/movie_details" >
-
+            android:label="@string/movie_details"
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
+        </activity>
 
+        <provider
+            android:name=".data.MovieProvider"
+            android:authorities="@string/authority"
+            android:exported="true" />
+
+        <service
+            android:name=".utils.MoviesSyncService"
+            android:exported="false" />
+        <service
+            android:name=".utils.ReviewSyncService"
+            android:exported="false" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MovieDetail">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MovieDetail" />
         </activity>
     </application>
 

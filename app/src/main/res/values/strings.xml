@@ -6,4 +6,56 @@
     <string name="movie_details">Movie Details</string>
     <string name="most_popular">Most Popular</string>
     <string name="highest_rated">Highest Rated</string>
+    <string name="reviews">Reviews</string>
+
+    <string name="show_favorites">Favorites</string>
+    <string name="action_add_favorite">Add to Favourites</string>
+
+    <string name="authority">com.example.android.popularmovies</string>
+
+    <string name="movie_title">Faith of the Furious</string>
+    <string name="release_date">12 of April, 2017</string>
+    <string name="movie_plot">Fast and Furious part 8</string>
+    <string name="movie_review">This is an horrible movie, Too many flying cars and guns. Thats too bad for a movie with so much hype.</string>
+    <string name="reviewer_name" translatable="false">Bolatan</string>
+
+    <string name="review_label">Reviews:</string>
+
+    <string name="trailer_label">Trailers:</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_trailers">Trailers</string>
+
+    <string name="pref_all_videos" translatable="false">all_videos</string>
+    <string name="pref_title_trailers_only">Trailers only</string>
+    <string name="pref_description_trailers_only">Show only movie trailers</string>
+
+    <string name="pref_title_video_quality">Video Quality</string>
+    <string name="pref_video_quality" translatable="false">video_quality</string>
+
+    <string name="video_low_quality">720 HD</string>
+    <string name="video_high_quality">1080 HD</string>
+
+    <string name="pref_low_hd">720</string>
+    <string name="pref_high_hd">1080</string>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_reviews">Reviews</string>
+    <string name="pref_reviews_length" translatable="false">review_length</string>
+
+    <string name="pref_title_review_text_length">Text lenght</string>
+
+    <string name="length_3">3 lines</string>
+    <string name="lenght_6">6 lines</string>
+    <string name="lenght_9">9 lines</string>
+    <string name="lenght_default">Default text</string>
+
+    <string name="length_value_3">3</string>
+    <string name="length_value_6">6</string>
+    <string name="length_value_9">9</string>
+    <string name="length_value_default">Default</string>
+
 </resources>

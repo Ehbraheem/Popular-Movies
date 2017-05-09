@@ -1,0 +1,11 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:defaultValue="@string/length_value_3"
+        android:entries="@array/pref_review_lenght_titles"
+        android:entryValues="@array/pref_reviews_length_values"
+        android:key="@string/pref_reviews_length"
+        android:title="@string/pref_title_review_text_length"
+        />
+
+</PreferenceScreen>

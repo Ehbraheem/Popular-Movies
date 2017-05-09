@@ -12,14 +12,27 @@ import java.net.URL;
 public abstract class APIDetails {
 
     // TODO: ADD Your API Key => here
-    private static final String API_KEY = ""; // Add your key here
+    private static final String API_KEY = BuildConfig.MOVIE_API_KEY; // Add your key here
     private static final String MOVIE_API = "http://api.themoviedb.org/3/movie/";
     private static final String IMAGE_PATH = "http://image.tmdb.org/t/p/";
+
+    private static final String VIDEO_THUMBNAIL = "http://img.youtube.com/vi/";
+    public static final String DEFAULT_THUMBNAIL = "hqdefault.jpg";
 
     /*
     @param  String [apiPath, itemPath], boolean attatchKey
     @return
      */
+    private static String attachExtraPath(String baseUrl, String ... paths) {
+        String newPath = baseUrl;
+
+        for (String path: paths) {
+            newPath += path;
+        }
+        return newPath;
+    }
+
+
     private static URL makeUrl (boolean attatchKey, String ... path) {
         URL url = null;
         String itemPath = null;
@@ -46,12 +59,27 @@ public abstract class APIDetails {
     }
 
     public static URL makePosterUrl (String posterPath, String size) {
-        String absolutePath = IMAGE_PATH + size;
+        String absolutePath = attachExtraPath(IMAGE_PATH, size);
         return makeUrl(false, absolutePath, posterPath);
     }
 
     public static URL makeResourceUrl (String type) {
-        String resourceType = MOVIE_API + type;
+        String resourceType = attachExtraPath(MOVIE_API, type);
         return makeUrl(true, resourceType);
+    }
+
+    public static URL makeTraillerUrl(String key) {
+        String movieInfo = attachExtraPath(MOVIE_API, key, "/videos");
+        return makeUrl(true, movieInfo);
+    }
+
+    public static URL reviewUrl (String key) {
+        String reviewInfo = attachExtraPath(MOVIE_API, key, "/reviews");
+        return makeUrl(true, reviewInfo);
+    }
+
+    public static URL trailerThumbnails(String key) {
+        String videoThumbnail = attachExtraPath(VIDEO_THUMBNAIL, key);
+        return makeUrl(false, videoThumbnail, DEFAULT_THUMBNAIL);
     }
 }
